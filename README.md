@@ -1,6 +1,5 @@
 # install dependencies
-yarn
-```
+- yarn
 
 ### Development Scripts
 
