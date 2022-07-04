@@ -12,6 +12,7 @@ function createWindow() {
         height: 600,
         webPreferences: {
             nodeIntegration: true,
+            // Include the .js file, since it will be compiled from .ts by the time it is used by electron
             preload: __dirname + '/preload.js'
         }
     });
