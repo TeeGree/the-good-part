@@ -1,12 +1,26 @@
 import React from 'react';
 import logo from './logo.svg';
 import './App.css';
-import Button from '@mui/material/Button';
+import { Howl } from 'howler';
 
 
 function App() {
-    const openFile = async () => {
-        await window.electron.openFile();
+    const openFile = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        //const filepathResult = await window.electron.openFile();
+        if (event.target.files !== null && event.target.files.length > 0) {
+            const file = event.target.files[0];
+            const reader = new FileReader();
+            reader.addEventListener('load', function() {
+                const data = reader.result as string;
+                const sound = new Howl({ src: [data] });
+
+                sound.play();
+            })
+        
+
+            reader.readAsDataURL(file);
+        }
+        
     }
 
     return (
@@ -16,7 +30,7 @@ function App() {
                 <p>
                     Edit <code>src/App.tsx</code> and save to reload.
                 </p>
-                <Button onClick={openFile}>Click me</Button>
+                <input type="file" onChange={openFile} />
             </header>
         </div>
     );

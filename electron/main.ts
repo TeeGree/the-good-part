@@ -47,6 +47,7 @@ function createWindow() {
     const openFile = async () => {
         const fileResult = await dialog.showOpenDialog(win as BrowserWindow, { properties: ['openFile'] });
         console.log(fileResult.filePaths);
+        return fileResult.filePaths[0];
     }
 
     ipcMain.handle('open-file', async (event, message) => {

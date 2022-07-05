@@ -1,5 +1,5 @@
 export interface IElectronAPI {
-    openFile: () => Promise<void>,
+    openFile: () => Promise<string>,
 }
 
 declare global {
