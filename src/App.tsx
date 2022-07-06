@@ -2,7 +2,8 @@ import React from 'react';
 import logo from './logo.svg';
 import './App.css';
 import { Howl } from 'howler';
-
+import classes from './App.module.scss';
+import Button from '@mui/material/Button';
 
 function App() {
     const openFile = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -30,7 +31,12 @@ function App() {
                 <p>
                     Edit <code>src/App.tsx</code> and save to reload.
                 </p>
-                <input type="file" onChange={openFile} />
+                <input id="fileUpload" type="file" className={classes.hidden} onChange={openFile} />
+                <label htmlFor="fileUpload">
+                    <Button variant="contained" color="primary" component="span">
+                        Choose music file to play
+                    </Button>
+                </label>
             </header>
         </div>
     );
