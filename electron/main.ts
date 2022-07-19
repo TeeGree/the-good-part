@@ -1,6 +1,7 @@
-import { app, BrowserWindow, dialog, ipcMain } from 'electron';
+import { app, BrowserWindow, ipcMain } from 'electron';
 import * as path from 'path';
 import * as isDev from 'electron-is-dev';
+import * as mm from 'music-metadata';
 import installExtension, { REACT_DEVELOPER_TOOLS } from "electron-devtools-installer";
 
 let win: BrowserWindow | null = null;
@@ -13,7 +14,7 @@ function createWindow() {
             nodeIntegration: true,
             // Include the .js file, since it will be compiled from .ts by the time it is used by electron
             preload: __dirname + '/preload.js'
-        }
+        },
     });
 
     if (isDev) {
@@ -44,14 +45,12 @@ function createWindow() {
         win.webContents.openDevTools();
     }
 
-    const openFile = async () => {
-        const fileResult = await dialog.showOpenDialog(win as BrowserWindow, { properties: ['openFile'] });
-        console.log(fileResult.filePaths);
-        return fileResult.filePaths[0];
+    const getFileMetadata = async (filepath: string): Promise<mm.IAudioMetadata> => {
+        return await mm.parseFile(filepath);
     }
 
-    ipcMain.handle('open-file', async (event, message) => {
-        return await openFile()
+    ipcMain.handle('get-file-metadata', async (event, message) => {
+        return await getFileMetadata(message as string)
             .then((data) => {
                 console.log('handle: ' + data); // Testing
                 return data;

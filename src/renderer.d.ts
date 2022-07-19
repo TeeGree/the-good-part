@@ -1,5 +1,7 @@
+import * as mm from 'music-metadata';
+
 export interface IElectronAPI {
-    openFile: () => Promise<string>,
+    getFileMetadata: (filepath: string) => Promise<mm.IAudioMetadata>,
 }
 
 declare global {

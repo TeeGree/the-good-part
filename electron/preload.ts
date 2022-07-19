@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer } from 'electron';
 
 contextBridge.exposeInMainWorld('electron', {
-    openFile: () => ipcRenderer.invoke('open-file')
+    getFileMetadata: () => ipcRenderer.invoke('get-file-metadata')
 });
