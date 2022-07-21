@@ -18,12 +18,13 @@
     "@types/node": "^16.11.43",
     "@types/react": "^18.0.14",
     "@types/react-dom": "^18.0.5",
+    "buffer": "^6.0.3",
     "electron-devtools-installer": "^3.2.0",
     "electron-is-dev": "^2.0.0",
     "electron-reload": "^2.0.0-alpha.1",
     "howler": "^2.2.3",
-    "music-metadata": "^7.12.4",
     "music-metadata-browser": "^2.5.7",
+    "process": "^0.11.10",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-scripts": "5.0.1",
@@ -39,11 +40,6 @@
     "directories": {
       "buildResources": "assets"
     }
-  },
-  "browser": {
-    "fs": false,
-    "path": false,
-    "os": false
   },
   "scripts": {
     "start": "react-scripts start",
