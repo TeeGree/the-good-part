@@ -1,12 +1,18 @@
 import { Howl } from 'howler';
 import * as mm from 'music-metadata-browser';
 import classes from './PlayingSongInfo.module.scss';
+import PauseIcon from '@mui/icons-material/Pause';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import IconButton from '@mui/material/IconButton';
 
 interface IPlayingSongInfoProps {
     fileBeingPlayed?: File,
     fileMetadata?: mm.IAudioMetadata
     playingSound?: Howl,
     playingSoundPercentPlayed: number | null;
+    onPause: () => void;
+    onPlay: () => void;
+    isPaused: boolean;
 };
 
 export const PlayingSongInfo: React.FC<IPlayingSongInfoProps> = (props: IPlayingSongInfoProps) => {
@@ -27,8 +33,16 @@ export const PlayingSongInfo: React.FC<IPlayingSongInfoProps> = (props: IPlaying
         return songTitleText;
     }
 
+    const getPlayPauseIcon = (): JSX.Element => {
+        if (props.isPaused) {
+            return (<IconButton color="inherit" onClick={props.onPlay}><PlayArrowIcon  /></IconButton>)
+        }
+
+        return (<IconButton color="inherit" onClick={props.onPause}><PauseIcon /></IconButton>);
+    }
+
     const getPlayingSongInfo = (): JSX.Element => {
-        if (props.playingSound && props.playingSound && props.playingSound.playing()) {
+        if (props.playingSound && props.playingSound) {
             const songTitleText = getSongTitleText();
             const percentPlayed = props.playingSoundPercentPlayed === null ? 0 : props.playingSoundPercentPlayed;
             const width = `${percentPlayed}%`;
@@ -40,6 +54,7 @@ export const PlayingSongInfo: React.FC<IPlayingSongInfoProps> = (props: IPlaying
                         </div>
                     </div>
                     <div>{songTitleText}</div>
+                    {getPlayPauseIcon()}
                 </div>
             );
         }

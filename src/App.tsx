@@ -15,20 +15,34 @@ function App() {
     const [fileBeingPlayed, setFileBeingPlayed] = useState<File>();
     const [playingSoundMetadata, setPlayingSoundMetadata] = useState<mm.IAudioMetadata>();
     const [playingSoundPercentPlayed, setPlayingSoundPercentPlayed] = useState<number | null>(null);
+    const [isPaused, setIsPaused] = useState<boolean>(false);
 
     useEffect(() => {
         const interval = setInterval(() => {
             if (playingSound && playingSound && playingSound.playing()) {
                 const duration = playingSound.duration();
                 const playbackPosition = playingSound.seek();
-                setPlayingSoundPercentPlayed((playbackPosition / duration) * 100);
-            } else if (playingSound !== undefined) {
-                setPlayingSound(undefined);
-                setPlayingSoundPercentPlayed(null);
+                if (duration === playbackPosition) {
+                    setPlayingSound(undefined);
+                    setPlayingSoundPercentPlayed(null);
+                } else {
+                    setPlayingSoundPercentPlayed((playbackPosition / duration) * 100);
+                }
             }
         }, 1000);
         return () => clearInterval(interval);
     }, [playingSound]);
+
+    useEffect(() => {
+        if (playingSound === undefined) {
+            return;
+        }
+        if (isPaused) {
+            playingSound?.pause();
+        } else {
+            playingSound?.play();
+        }
+    }, [isPaused]);
 
     const openFile = async (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.files !== null && event.target.files.length > 0) {
@@ -46,8 +60,12 @@ function App() {
             
         const howlerSound = new Howl({ src: [filepath], preload: true });
 
-        howlerSound.on('play', () => {
+        howlerSound.once('play', () => {
             setPlayingSound(howlerSound);
+        });
+
+        howlerSound.once('end', () => {
+            setPlayingSound(undefined);
         })
         
         howlerSound.play();
@@ -57,6 +75,11 @@ function App() {
         if (playingSound) {
             playingSound.stop();
             setPlayingSoundPercentPlayed(null);
+            setPlayingSound(undefined);
+        }
+
+        if (isPaused) {
+            setIsPaused(false);
         }
         setFileBeingPlayed(file);
         const metadata = await mm.parseBlob(file);
@@ -67,9 +90,17 @@ function App() {
         reader.readAsDataURL(file);
     }
 
+    const pausePlayingSong = () => {
+        setIsPaused(true);
+    }
+
+    const resumePlayingSong = () => {
+        setIsPaused(false);
+    }
+
     return (
         <div className={classes.app}>
-            <body className={classes.appContainer}>
+            <div className={classes.appContainer}>
                 <FileUpload label="Choose music file to play" onFileSelection={openFile} />
                 <div className={classes.playingSongInfo}>
                     <PlayingSongInfo
@@ -77,9 +108,12 @@ function App() {
                         fileMetadata={playingSoundMetadata}
                         playingSound={playingSound}
                         playingSoundPercentPlayed={playingSoundPercentPlayed}
+                        onPause={pausePlayingSong}
+                        onPlay={resumePlayingSong}
+                        isPaused={isPaused}
                     />
                 </div>
-            </body>
+            </div>
         </div>
     );
 }
