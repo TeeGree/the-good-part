@@ -20,27 +20,42 @@ interface IPlayingSongInfoProps {
 export const PlayingSongInfo: React.FC<IPlayingSongInfoProps> = (props: IPlayingSongInfoProps) => {
     
     const getSongTitleText = () => {
+        const createSongText = (songTitle: string) => {
+            return `Currently playing: ${songTitle}`;
+        }
+
         let songTitleText = 'Song';
         const fallbackFilename = props.fileBeingPlayed?.name;
         const title = props.fileMetadata?.common?.title;
         const artist = props.fileMetadata?.common?.artist;
         if (title) {
-            songTitleText = `Currently playing: ${title}`;
+            songTitleText = title;
             if (artist) {
                 songTitleText += ` by ${artist}`;
             }
         } else if (fallbackFilename) {
-            songTitleText = `Currently playing: ${fallbackFilename}`;
+            songTitleText = fallbackFilename;
         }
-        return songTitleText;
+        return createSongText(songTitleText);
+    }
+
+    const togglePlay = () => {
+        if (props.isPaused) {
+            props.onPlay();
+        } else {
+            props.onPause();
+        }
     }
 
     const getPlayPauseIcon = (): JSX.Element => {
-        if (props.isPaused) {
-            return (<IconButton color="inherit" onClick={props.onPlay}><PlayArrowIcon  /></IconButton>)
-        }
-
-        return (<IconButton color="inherit" onClick={props.onPause}><PauseIcon /></IconButton>);
+        return (
+            <IconButton
+                color="inherit"
+                onClick={togglePlay}
+            >
+                {props.isPaused ? (<PlayArrowIcon />) : (<PauseIcon />)}
+            </IconButton>
+        );
     }
 
     const padSeconds = (seconds: number): string => {
