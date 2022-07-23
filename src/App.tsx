@@ -14,7 +14,8 @@ function App() {
     const [playingSound, setPlayingSound] = useState<Howl>();
     const [fileBeingPlayed, setFileBeingPlayed] = useState<File>();
     const [playingSoundMetadata, setPlayingSoundMetadata] = useState<mm.IAudioMetadata>();
-    const [playingSoundPercentPlayed, setPlayingSoundPercentPlayed] = useState<number | null>(null);
+    const [currentPlaybackTime, setCurrentPlaybackTime] = useState<number | null>(null);
+    const [totalDuration, setTotalDuration] = useState<number | null>(null);
     const [isPaused, setIsPaused] = useState<boolean>(false);
 
     useEffect(() => {
@@ -24,9 +25,11 @@ function App() {
                 const playbackPosition = playingSound.seek();
                 if (duration === playbackPosition) {
                     setPlayingSound(undefined);
-                    setPlayingSoundPercentPlayed(null);
+                    setCurrentPlaybackTime(null);
+                    setTotalDuration(null);
                 } else {
-                    setPlayingSoundPercentPlayed((playbackPosition / duration) * 100);
+                    setCurrentPlaybackTime(playbackPosition);
+                    setTotalDuration(duration);
                 }
             }
         }, 1000);
@@ -62,6 +65,7 @@ function App() {
 
         howlerSound.once('play', () => {
             setPlayingSound(howlerSound);
+            setTotalDuration(howlerSound.duration());
         });
 
         howlerSound.once('end', () => {
@@ -74,7 +78,8 @@ function App() {
     const playSong = async (file: File) => {
         if (playingSound) {
             playingSound.stop();
-            setPlayingSoundPercentPlayed(null);
+            setCurrentPlaybackTime(null);
+            setTotalDuration(null);
             setPlayingSound(undefined);
         }
 
@@ -107,10 +112,11 @@ function App() {
                         fileBeingPlayed={fileBeingPlayed}
                         fileMetadata={playingSoundMetadata}
                         playingSound={playingSound}
-                        playingSoundPercentPlayed={playingSoundPercentPlayed}
                         onPause={pausePlayingSong}
                         onPlay={resumePlayingSong}
                         isPaused={isPaused}
+                        currentPlaybackTime={currentPlaybackTime}
+                        totalDuration={totalDuration}
                     />
                 </div>
             </div>
