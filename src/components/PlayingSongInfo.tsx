@@ -6,7 +6,7 @@ interface IPlayingSongInfoProps {
     fileBeingPlayed?: File,
     fileMetadata?: mm.IAudioMetadata
     playingSound?: Howl,
-    playingSoundPercentPlayed: number
+    playingSoundPercentPlayed: number | null;
 };
 
 export const PlayingSongInfo: React.FC<IPlayingSongInfoProps> = (props: IPlayingSongInfoProps) => {
@@ -30,16 +30,17 @@ export const PlayingSongInfo: React.FC<IPlayingSongInfoProps> = (props: IPlaying
     const getPlayingSongInfo = (): JSX.Element => {
         if (props.playingSound && props.playingSound && props.playingSound.playing()) {
             const songTitleText = getSongTitleText();
-            const width = `${props.playingSoundPercentPlayed}%`;
+            const percentPlayed = props.playingSoundPercentPlayed === null ? 0 : props.playingSoundPercentPlayed;
+            const width = `${percentPlayed}%`;
             
             return (
-                <>
-                    <div>{songTitleText}</div>
+                <div className={classes.songInfoContainer}>
                     <div className={classes.progressBarContainer}>
                         <div className={classes.progressBarFill} style={{ width: width }}>
                         </div>
                     </div>
-                </>
+                    <div>{songTitleText}</div>
+                </div>
             );
         }
         return (<></>);

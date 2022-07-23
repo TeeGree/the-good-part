@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import logo from './logo.svg';
-import './App.css';
 import { Howl } from 'howler';
 import { FileUpload } from './components/FileUpload';
 import * as mm from 'music-metadata-browser';
 import { Buffer } from 'buffer';
 import * as process from 'process';
 import { PlayingSongInfo } from './components/PlayingSongInfo';
+import classes from './App.module.scss';
 
 window.Buffer = Buffer;
 window.process = process;
@@ -15,7 +14,7 @@ function App() {
     const [playingSound, setPlayingSound] = useState<Howl>();
     const [fileBeingPlayed, setFileBeingPlayed] = useState<File>();
     const [playingSoundMetadata, setPlayingSoundMetadata] = useState<mm.IAudioMetadata>();
-    const [playingSoundPercentPlayed, setPlayingSoundPercentPlayed] = useState<number>(0);
+    const [playingSoundPercentPlayed, setPlayingSoundPercentPlayed] = useState<number | null>(null);
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -23,6 +22,9 @@ function App() {
                 const duration = playingSound.duration();
                 const playbackPosition = playingSound.seek();
                 setPlayingSoundPercentPlayed((playbackPosition / duration) * 100);
+            } else if (playingSound !== undefined) {
+                setPlayingSound(undefined);
+                setPlayingSoundPercentPlayed(null);
             }
         }, 1000);
         return () => clearInterval(interval);
@@ -54,7 +56,7 @@ function App() {
     const playSong = async (file: File) => {
         if (playingSound) {
             playingSound.stop();
-            setPlayingSoundPercentPlayed(0);
+            setPlayingSoundPercentPlayed(null);
         }
         setFileBeingPlayed(file);
         const metadata = await mm.parseBlob(file);
@@ -66,20 +68,18 @@ function App() {
     }
 
     return (
-        <div className="App">
-            <header className="App-header">
-                <img src={logo} className="App-logo" alt="logo" />
-                <p>
-                    Edit <code>src/App.tsx</code> and save to reload.
-                </p>
+        <div className={classes.app}>
+            <body className={classes.appContainer}>
                 <FileUpload label="Choose music file to play" onFileSelection={openFile} />
-                <PlayingSongInfo
-                    fileBeingPlayed={fileBeingPlayed}
-                    fileMetadata={playingSoundMetadata}
-                    playingSound={playingSound}
-                    playingSoundPercentPlayed={playingSoundPercentPlayed}
-                />
-            </header>
+                <div className={classes.playingSongInfo}>
+                    <PlayingSongInfo
+                        fileBeingPlayed={fileBeingPlayed}
+                        fileMetadata={playingSoundMetadata}
+                        playingSound={playingSound}
+                        playingSoundPercentPlayed={playingSoundPercentPlayed}
+                    />
+                </div>
+            </body>
         </div>
     );
 }
