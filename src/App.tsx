@@ -6,6 +6,7 @@ import { Buffer } from 'buffer';
 import * as process from 'process';
 import { PlayingSongInfo } from './components/PlayingSongInfo';
 import classes from './App.module.scss';
+import { AppSettings } from './models/AppSettings';
 
 window.Buffer = Buffer;
 window.process = process;
@@ -17,6 +18,13 @@ function App() {
     const [currentPlaybackTime, setCurrentPlaybackTime] = useState<number | null>(null);
     const [totalDuration, setTotalDuration] = useState<number | null>(null);
     const [isPaused, setIsPaused] = useState<boolean>(false);
+    const [appSettings, setAppSettings] = useState<AppSettings>();
+
+    useEffect(() => {
+        window.electron.getSettings().then((settings) => {
+            setAppSettings(settings);
+        });
+    }, []);
 
     useEffect(() => {
         const interval = setInterval(() => {

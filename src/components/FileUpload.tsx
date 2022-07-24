@@ -2,12 +2,12 @@ import React from 'react';
 import classes from './FileUpload.module.scss';
 import Button from '@mui/material/Button';
 
-interface IFileUploadProps {
+interface FileUploadProps {
     label: string,
     onFileSelection: (event: React.ChangeEvent<HTMLInputElement>) => void,
 };
 
-export const FileUpload: React.FC<IFileUploadProps> = (props: IFileUploadProps) => {
+export const FileUpload: React.FC<FileUploadProps> = (props: FileUploadProps) => {
     
     return (
         <>

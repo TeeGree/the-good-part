@@ -4,9 +4,8 @@ import classes from './PlayingSongInfo.module.scss';
 import PauseIcon from '@mui/icons-material/Pause';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import IconButton from '@mui/material/IconButton';
-import { RoundaboutLeft } from '@mui/icons-material';
 
-interface IPlayingSongInfoProps {
+interface PlayingSongInfoProps {
     fileBeingPlayed?: File,
     fileMetadata?: mm.IAudioMetadata
     playingSound?: Howl,
@@ -17,7 +16,7 @@ interface IPlayingSongInfoProps {
     totalDuration: number | null;
 };
 
-export const PlayingSongInfo: React.FC<IPlayingSongInfoProps> = (props: IPlayingSongInfoProps) => {
+export const PlayingSongInfo: React.FC<PlayingSongInfoProps> = (props: PlayingSongInfoProps) => {
     
     const getSongTitleText = () => {
         const createSongText = (songTitle: string) => {
