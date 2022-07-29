@@ -1,8 +1,13 @@
-export interface SongInfo {
-    name: string,
-    filepath: string
+export interface SongInfoFromSettings {
+    id: string,
+    relativePath: string,
+    fullPath: string
 }
 
 export interface AppSettings {
-    songs: SongInfo[]
+    songs: SongInfoFromSettings[]
+}
+
+export interface AppSettingsFromFile {
+    songs: SongInfoFromSettings[]
 }

@@ -6,7 +6,7 @@ import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import IconButton from '@mui/material/IconButton';
 
 interface PlayingSongInfoProps {
-    fileBeingPlayed?: File,
+    nameOfFile?: string,
     fileMetadata?: mm.IAudioMetadata
     playingSound?: Howl,
     onPause: () => void;
@@ -24,7 +24,7 @@ export const PlayingSongInfo: React.FC<PlayingSongInfoProps> = (props: PlayingSo
         }
 
         let songTitleText = 'Song';
-        const fallbackFilename = props.fileBeingPlayed?.name;
+        const fallbackFilename = props.nameOfFile;
         const title = props.fileMetadata?.common?.title;
         const artist = props.fileMetadata?.common?.artist;
         if (title) {

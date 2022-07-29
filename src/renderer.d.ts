@@ -1,8 +1,10 @@
 import * as mm from 'music-metadata';
 import { AppSettings } from './models/AppSettings';
+import { SongInfo } from './models/SongInfo';
 
 export interface IElectronAPI {
     getFileMetadata: (filepath: string) => Promise<mm.IAudioMetadata>,
+    getSongInfo: (filepath: string) => Promise<SongInfo>,
     getSettings: () => Promise<AppSettings>
 }
 

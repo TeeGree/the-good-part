@@ -24,3 +24,6 @@ yarn-error.log*
 
 # user app settings file that changes during runtime
 the-good-part.settings.json
+
+# user loaded songs
+public/*.mp3

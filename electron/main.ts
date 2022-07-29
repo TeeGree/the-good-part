@@ -5,6 +5,7 @@ import * as mm from 'music-metadata';
 import installExtension, { REACT_DEVELOPER_TOOLS } from "electron-devtools-installer";
 import * as fs from 'fs';
 import { AppSettings } from '../src/models/AppSettings';
+import { SongInfo } from '../src/models/SongInfo';
 
 let win: BrowserWindow | null = null;
 
@@ -77,15 +78,35 @@ function createWindow() {
             });
     });
 
+    const getSongInfo = async (filepath: string): Promise<SongInfo> => {
+        const metadata = await mm.parseFile(filepath);
+
+        const filepathParts = filepath.split('\\');
+        const lastFilePart = filepathParts[filepathParts.length - 1];
+
+        const songInfo: SongInfo = {
+            filename: lastFilePart,
+            fullPath: filepath,
+            relativePath: `/${lastFilePart}`,
+            metadata: metadata
+        };
+
+        return songInfo;
+    }
+
+    ipcMain.handle('get-song-info', async (event, filepath: string) => {
+        return await getSongInfo(filepath)
+            .catch((error) => {
+                return 'Error getting song info';
+            });
+    });
+
     const getFileMetadata = async (filepath: string): Promise<mm.IAudioMetadata> => {
         return await mm.parseFile(filepath);
     }
 
-    ipcMain.handle('get-file-metadata', async (event, message) => {
-        return await getFileMetadata(message as string)
-            .then((data) => {
-                return data;
-            })
+    ipcMain.handle('get-file-metadata', async (event, filepath: string) => {
+        return await getFileMetadata(filepath)
             .catch((error) => {
                 return 'Error getting file metadata';
             });

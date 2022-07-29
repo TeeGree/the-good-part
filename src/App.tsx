@@ -13,7 +13,7 @@ window.process = process;
 
 function App() {
     const [playingSound, setPlayingSound] = useState<Howl>();
-    const [fileBeingPlayed, setFileBeingPlayed] = useState<File>();
+    const [nameOfFile, setNameOfFile] = useState<string>();
     const [playingSoundMetadata, setPlayingSoundMetadata] = useState<mm.IAudioMetadata>();
     const [currentPlaybackTime, setCurrentPlaybackTime] = useState<number | null>(null);
     const [totalDuration, setTotalDuration] = useState<number | null>(null);
@@ -23,6 +23,13 @@ function App() {
     useEffect(() => {
         window.electron.getSettings().then((settings) => {
             setAppSettings(settings);
+            if (settings.songs.length > 0 && playingSoundMetadata === undefined) {
+                window.electron.getSongInfo(settings.songs[0].fullPath).then(songInfo => {
+                    // This will play twice in development because of strict mode.
+                    setPlayingSoundMetadata(songInfo.metadata);
+                    onLoadSong(songInfo.relativePath, songInfo.filename);
+                });
+            }
         });
     }, []);
 
@@ -62,17 +69,12 @@ function App() {
         }
     }
 
-    const onFileReaderLoadSong = async (event: ProgressEvent<FileReader>) => {
-        if (event.target == null) {
-            return;
-        }
-        
-        const filepath = event.target.result as string;
-            
+    const onLoadSong = (filepath: string, fileName: string) => {
         const howlerSound = new Howl({ src: [filepath], preload: true });
 
         howlerSound.once('play', () => {
             setPlayingSound(howlerSound);
+            setNameOfFile(fileName);
             setTotalDuration(howlerSound.duration());
         });
 
@@ -80,6 +82,10 @@ function App() {
             setPlayingSound(undefined);
         })
         
+        if (playingSound) {
+            playingSound.stop();
+        }
+
         howlerSound.play();
     }
 
@@ -94,11 +100,15 @@ function App() {
         if (isPaused) {
             setIsPaused(false);
         }
-        setFileBeingPlayed(file);
+        
         const metadata = await mm.parseBlob(file);
         setPlayingSoundMetadata(metadata);
         const reader = new FileReader();
-        reader.addEventListener('load', onFileReaderLoadSong);
+        reader.addEventListener('load', (event: ProgressEvent<FileReader>) => {
+            if (event.target !== null) {
+                onLoadSong(event.target.result as string, file.name);
+            }
+        });
 
         reader.readAsDataURL(file);
     }
@@ -111,22 +121,34 @@ function App() {
         setIsPaused(false);
     }
 
+    const getMusicFileInput = (): JSX.Element => {
+        if (appSettings === undefined) {
+            return (
+                <>
+                    <FileUpload label="Choose music file to play" onFileSelection={openFile} />
+                    <div className={classes.playingSongInfo}>
+                        <PlayingSongInfo
+                            nameOfFile={nameOfFile}
+                            fileMetadata={playingSoundMetadata}
+                            playingSound={playingSound}
+                            onPause={pausePlayingSong}
+                            onPlay={resumePlayingSong}
+                            isPaused={isPaused}
+                            currentPlaybackTime={currentPlaybackTime}
+                            totalDuration={totalDuration}
+                        />
+                    </div>
+                </>
+            );
+        }
+
+        return (<></>);
+    }
+
     return (
         <div className={classes.app}>
             <div className={classes.appContainer}>
-                <FileUpload label="Choose music file to play" onFileSelection={openFile} />
-                <div className={classes.playingSongInfo}>
-                    <PlayingSongInfo
-                        fileBeingPlayed={fileBeingPlayed}
-                        fileMetadata={playingSoundMetadata}
-                        playingSound={playingSound}
-                        onPause={pausePlayingSong}
-                        onPlay={resumePlayingSong}
-                        isPaused={isPaused}
-                        currentPlaybackTime={currentPlaybackTime}
-                        totalDuration={totalDuration}
-                    />
-                </div>
+                {getMusicFileInput()}
             </div>
         </div>
     );
