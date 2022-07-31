@@ -6,18 +6,10 @@ import * as process from 'process';
 import { PlayingSongInfo } from './components/PlayingSongInfo';
 import classes from './App.module.scss';
 import { AppSettings } from './models/AppSettings';
-import { Routes, Route, Link, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { Library } from './components/pages/Library';
 import { PlayFile } from './components/pages/PlayFile';
-import Drawer from '@mui/material/Drawer';
-import Toolbar from '@mui/material/Toolbar';
-import Divider from '@mui/material/Divider';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
-import { FileUpload, QueueMusic } from '@mui/icons-material';
+import { NavPanel } from './components/NavPanel';
 import { getFilenameFromPath } from './utility/FilePathUtils';
 
 // Needed to polyfill dependencies that have been removed from Node.
@@ -149,40 +141,7 @@ function App() {
                     />
                     <Route path="*" element={<Navigate to="/" replace />} />
                 </Routes>
-                <Drawer
-                    className={classes.navDrawer}
-                    PaperProps={{
-                        className: classes.drawerPaper
-                    }}
-                    variant="permanent"
-                    anchor="left"
-                >
-                    <Toolbar />
-                    <Divider />
-                    <List>
-                        <ListItem disablePadding>
-                            <Link className={classes.link} to="/">
-                                <ListItemButton>
-                                    <ListItemIcon className={classes.icon}>
-                                        <QueueMusic />
-                                    </ListItemIcon>
-                                    <ListItemText primary="Library" />
-                                </ListItemButton>
-                            </Link>
-                        </ListItem>
-                        <ListItem disablePadding>
-                            <Link className={classes.link} to="play-file">
-                                <ListItemButton>
-                                    <ListItemIcon className={classes.icon}>
-                                        <FileUpload />
-                                    </ListItemIcon>
-                                    <ListItemText primary="Play File" />
-                                </ListItemButton>
-                            </Link>
-                        </ListItem>
-                    </List>
-                    <Divider />
-                </Drawer>
+                <NavPanel />
                 {getPlayingSongInfo()}
             </div>
         </div>
