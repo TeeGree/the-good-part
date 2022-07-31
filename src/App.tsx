@@ -6,7 +6,7 @@ import * as process from 'process';
 import { PlayingSongInfo } from './components/PlayingSongInfo';
 import classes from './App.module.scss';
 import { AppSettings } from './models/AppSettings';
-import { Routes, Route, Link } from "react-router-dom";
+import { Routes, Route, Link, Navigate } from "react-router-dom";
 import { Library } from './components/pages/Library';
 import { PlayFile } from './components/pages/PlayFile';
 import Drawer from '@mui/material/Drawer';
@@ -17,8 +17,6 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import createTheme from '@mui/material/styles/createTheme';
-import ThemeProvider from '@mui/material/styles/ThemeProvider';
 import { FileUpload, QueueMusic } from '@mui/icons-material';
 import { getFilenameFromPath } from './utility/FilePathUtils';
 
@@ -128,73 +126,66 @@ function App() {
         return (<></>);
     }
 
-    const theme = createTheme({
-        palette: {
-            mode: "dark"
-        }
-    });
-
     return (
-        <ThemeProvider theme={theme}>
-            <div className={classes.app}>
-                <div className={classes.appContainer}>
-                    <Routes>
-                        <Route
-                            index
-                            element={
-                                <Library appSettings={appSettings} playSong={playSong} />
-                            }
-                        />
-                        <Route
-                            path="play-file"
-                            element={
-                                <PlayFile
-                                    playingSound={playingSound}
-                                    clearPlayingSong={clearPlayingSong}
-                                    setPlayingSoundMetadata={setPlayingSoundMetadata}
-                                    playSong={playSong}
-                                />
-                            }
-                        />
-                    </Routes>
-                    <Drawer
-                        className={classes.navDrawer}
-                        PaperProps={{
-                            className: classes.drawerPaper
-                        }}
-                        variant="permanent"
-                        anchor="left"
-                    >
-                        <Toolbar />
-                        <Divider />
-                        <List>
-                            <ListItem disablePadding>
-                                <Link className={classes.link} to="/">
-                                    <ListItemButton>
-                                        <ListItemIcon>
-                                            <QueueMusic />
-                                        </ListItemIcon>
-                                        <ListItemText primary="Library" />
-                                    </ListItemButton>
-                                </Link>
-                            </ListItem>
-                            <ListItem disablePadding>
-                                <Link className={classes.link} to="play-file">
-                                    <ListItemButton>
-                                        <ListItemIcon>
-                                            <FileUpload />
-                                        </ListItemIcon>
-                                        <ListItemText primary="Play File" />
-                                    </ListItemButton>
-                                </Link>
-                            </ListItem>
-                        </List>
-                        <Divider />
-                    </Drawer>
-                    {getPlayingSongInfo()}
-                </div>
+        <div className={classes.app}>
+            <div className={classes.appContainer}>
+                <Routes>
+                    <Route
+                        path="/"
+                        element={
+                            <Library appSettings={appSettings} playSong={playSong} />
+                        }
+                    />
+                    <Route
+                        path="play-file"
+                        element={
+                            <PlayFile
+                                playingSound={playingSound}
+                                clearPlayingSong={clearPlayingSong}
+                                setPlayingSoundMetadata={setPlayingSoundMetadata}
+                                playSong={playSong}
+                            />
+                        }
+                    />
+                    <Route path="*" element={<Navigate to="/" replace />} />
+                </Routes>
+                <Drawer
+                    className={classes.navDrawer}
+                    PaperProps={{
+                        className: classes.drawerPaper
+                    }}
+                    variant="permanent"
+                    anchor="left"
+                >
+                    <Toolbar />
+                    <Divider />
+                    <List>
+                        <ListItem disablePadding>
+                            <Link className={classes.link} to="/">
+                                <ListItemButton>
+                                    <ListItemIcon className={classes.icon}>
+                                        <QueueMusic />
+                                    </ListItemIcon>
+                                    <ListItemText primary="Library" />
+                                </ListItemButton>
+                            </Link>
+                        </ListItem>
+                        <ListItem disablePadding>
+                            <Link className={classes.link} to="play-file">
+                                <ListItemButton>
+                                    <ListItemIcon className={classes.icon}>
+                                        <FileUpload />
+                                    </ListItemIcon>
+                                    <ListItemText primary="Play File" />
+                                </ListItemButton>
+                            </Link>
+                        </ListItem>
+                    </List>
+                    <Divider />
+                </Drawer>
+                {getPlayingSongInfo()}
             </div>
-        </ThemeProvider>
+        </div>
     );
 }
 

@@ -23,16 +23,20 @@
 .navDrawer {
     width: 3em;
     flex-shrink: 0;
-    color: inherit;
-    background-color: inherit;
+    color: inherit !important;
+    background-color: inherit !important;
 }
 
 .drawerPaper {
-    background-color: inherit;
-    color: inherit;
+    background-color: inherit !important;
+    color: inherit !important;
 }
 
 .link {
     text-decoration: none;
-    color: inherit;
+    color: inherit !important;
+}
+
+.icon {
+    color: inherit !important;
 }
