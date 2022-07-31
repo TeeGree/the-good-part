@@ -20,7 +20,9 @@ import ListItemText from '@mui/material/ListItemText';
 import createTheme from '@mui/material/styles/createTheme';
 import ThemeProvider from '@mui/material/styles/ThemeProvider';
 import { FileUpload, QueueMusic } from '@mui/icons-material';
+import { getFilenameFromPath } from './utility/FilePathUtils';
 
+// Needed to polyfill dependencies that have been removed from Node.
 window.Buffer = Buffer;
 window.process = process;
 
@@ -70,12 +72,6 @@ function App() {
         setPlayingSound(undefined);
         setCurrentPlaybackTime(null);
         setTotalDuration(null);
-    }
-
-    const getFilenameFromPath = (filepath: string) => {
-        const filepathParts = filepath.split('\\');
-        const lastFilePart = filepathParts[filepathParts.length - 1];
-        return lastFilePart;
     }
     
     const playSong = (filepath: string) => {

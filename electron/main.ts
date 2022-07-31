@@ -1,11 +1,8 @@
-import { app, BrowserWindow, ipcMain } from 'electron';
+import { app, BrowserWindow } from 'electron';
 import * as path from 'path';
 import * as isDev from 'electron-is-dev';
-import * as mm from 'music-metadata';
 import installExtension, { REACT_DEVELOPER_TOOLS } from "electron-devtools-installer";
-import * as fs from 'fs';
-import { AppSettings } from '../src/models/AppSettings';
-import { SongInfo } from '../src/models/SongInfo';
+import { setupIpcHandlers } from '../src/server/IpcHandlers';
 
 let win: BrowserWindow | null = null;
 
@@ -48,69 +45,7 @@ function createWindow() {
         win.webContents.openDevTools();
     }
 
-    const getSettings = (): Promise<AppSettings> => {
-        return new Promise((resolve, reject) => {
-            const configFile = './the-good-part.settings.json';
-            fs.readFile(configFile, 'utf8', function(fileNotFoundError, file) {
-                if (fileNotFoundError) {
-                    const defaultSettings: AppSettings = {
-                        songs: []
-                    };
-                    fs.writeFile(configFile, JSON.stringify(defaultSettings), (err) => {
-                        if (err) {
-                            reject(err);
-                        }
-                        
-                        resolve(defaultSettings);
-                    });
-                } else {
-                    const settings: AppSettings = JSON.parse(file);
-                    resolve(settings);
-                }
-            });
-        });
-    }
-
-    ipcMain.handle('get-settings', async (event) => {
-        return await getSettings()
-            .catch((error) => {
-                return 'Error reading settings file';
-            });
-    });
-
-    const getSongInfo = async (filepath: string): Promise<SongInfo> => {
-        const metadata = await mm.parseFile(filepath);
-
-        const filepathParts = filepath.split('\\');
-        const lastFilePart = filepathParts[filepathParts.length - 1];
-
-        const songInfo: SongInfo = {
-            filename: lastFilePart,
-            fullPath: filepath,
-            relativePath: `/${lastFilePart}`,
-            metadata: metadata
-        };
-
-        return songInfo;
-    }
-
-    ipcMain.handle('get-song-info', async (event, filepath: string) => {
-        return await getSongInfo(filepath)
-            .catch((error) => {
-                return 'Error getting song info';
-            });
-    });
-
-    const getFileMetadata = async (filepath: string): Promise<mm.IAudioMetadata> => {
-        return await mm.parseFile(filepath);
-    }
-
-    ipcMain.handle('get-file-metadata', async (event, filepath: string) => {
-        return await getFileMetadata(filepath)
-            .catch((error) => {
-                return 'Error getting file metadata';
-            });
-    });
+    setupIpcHandlers();
 }
 
 app.on('ready', createWindow);
