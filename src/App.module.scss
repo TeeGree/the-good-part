@@ -19,3 +19,20 @@
     bottom: 1px;
     width: 100%;
 }
+
+.navDrawer {
+    width: 3em;
+    flex-shrink: 0;
+    color: inherit;
+    background-color: inherit;
+}
+
+.drawerPaper {
+    background-color: inherit;
+    color: inherit;
+}
+
+.link {
+    text-decoration: none;
+    color: inherit;
+}

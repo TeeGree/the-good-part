@@ -1,12 +1,25 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Howl } from 'howler';
-import { FileUpload } from './components/FileUpload';
 import * as mm from 'music-metadata-browser';
 import { Buffer } from 'buffer';
 import * as process from 'process';
 import { PlayingSongInfo } from './components/PlayingSongInfo';
 import classes from './App.module.scss';
 import { AppSettings } from './models/AppSettings';
+import { Routes, Route, Link } from "react-router-dom";
+import { Library } from './components/pages/Library';
+import { PlayFile } from './components/pages/PlayFile';
+import Drawer from '@mui/material/Drawer';
+import Toolbar from '@mui/material/Toolbar';
+import Divider from '@mui/material/Divider';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import createTheme from '@mui/material/styles/createTheme';
+import ThemeProvider from '@mui/material/styles/ThemeProvider';
+import { FileUpload, QueueMusic } from '@mui/icons-material';
 
 window.Buffer = Buffer;
 window.process = process;
@@ -23,13 +36,6 @@ function App() {
     useEffect(() => {
         window.electron.getSettings().then((settings) => {
             setAppSettings(settings);
-            if (settings.songs.length > 0 && playingSoundMetadata === undefined) {
-                window.electron.getSongInfo(settings.songs[0].fullPath).then(songInfo => {
-                    // This will play twice in development because of strict mode.
-                    setPlayingSoundMetadata(songInfo.metadata);
-                    onLoadSong(songInfo.relativePath, songInfo.filename);
-                });
-            }
         });
     }, []);
 
@@ -39,9 +45,7 @@ function App() {
                 const duration = playingSound.duration();
                 const playbackPosition = playingSound.seek();
                 if (duration === playbackPosition) {
-                    setPlayingSound(undefined);
-                    setCurrentPlaybackTime(null);
-                    setTotalDuration(null);
+                    clearPlayingSong();
                 } else {
                     setCurrentPlaybackTime(playbackPosition);
                     setTotalDuration(duration);
@@ -62,19 +66,25 @@ function App() {
         }
     }, [isPaused]);
 
-    const openFile = async (event: React.ChangeEvent<HTMLInputElement>) => {
-        if (event.target.files !== null && event.target.files.length > 0) {
-            const file: File = event.target.files[0];
-            await playSong(file);
-        }
+    const clearPlayingSong = () => {
+        setPlayingSound(undefined);
+        setCurrentPlaybackTime(null);
+        setTotalDuration(null);
     }
 
-    const onLoadSong = (filepath: string, fileName: string) => {
+    const getFilenameFromPath = (filepath: string) => {
+        const filepathParts = filepath.split('\\');
+        const lastFilePart = filepathParts[filepathParts.length - 1];
+        return lastFilePart;
+    }
+    
+    const playSong = (filepath: string) => {
+        const filename = getFilenameFromPath(filepath);
         const howlerSound = new Howl({ src: [filepath], preload: true });
 
         howlerSound.once('play', () => {
             setPlayingSound(howlerSound);
-            setNameOfFile(fileName);
+            setNameOfFile(filename);
             setTotalDuration(howlerSound.duration());
         });
 
@@ -86,31 +96,11 @@ function App() {
             playingSound.stop();
         }
 
-        howlerSound.play();
-    }
-
-    const playSong = async (file: File) => {
-        if (playingSound) {
-            playingSound.stop();
-            setCurrentPlaybackTime(null);
-            setTotalDuration(null);
-            setPlayingSound(undefined);
-        }
-
         if (isPaused) {
             setIsPaused(false);
         }
-        
-        const metadata = await mm.parseBlob(file);
-        setPlayingSoundMetadata(metadata);
-        const reader = new FileReader();
-        reader.addEventListener('load', (event: ProgressEvent<FileReader>) => {
-            if (event.target !== null) {
-                onLoadSong(event.target.result as string, file.name);
-            }
-        });
 
-        reader.readAsDataURL(file);
+        howlerSound.play();
     }
 
     const pausePlayingSong = () => {
@@ -121,36 +111,94 @@ function App() {
         setIsPaused(false);
     }
 
-    const getMusicFileInput = (): JSX.Element => {
-        if (appSettings === undefined) {
+    const getPlayingSongInfo = (): JSX.Element => {
+        if (playingSound) {
             return (
-                <>
-                    <FileUpload label="Choose music file to play" onFileSelection={openFile} />
-                    <div className={classes.playingSongInfo}>
-                        <PlayingSongInfo
-                            nameOfFile={nameOfFile}
-                            fileMetadata={playingSoundMetadata}
-                            playingSound={playingSound}
-                            onPause={pausePlayingSong}
-                            onPlay={resumePlayingSong}
-                            isPaused={isPaused}
-                            currentPlaybackTime={currentPlaybackTime}
-                            totalDuration={totalDuration}
-                        />
-                    </div>
-                </>
+                <div className={classes.playingSongInfo}>
+                    <PlayingSongInfo
+                        nameOfFile={nameOfFile}
+                        fileMetadata={playingSoundMetadata}
+                        playingSound={playingSound}
+                        onPause={pausePlayingSong}
+                        onPlay={resumePlayingSong}
+                        isPaused={isPaused}
+                        currentPlaybackTime={currentPlaybackTime}
+                        totalDuration={totalDuration}
+                    />
+                </div>
             );
         }
-
+        
         return (<></>);
     }
 
+    const theme = createTheme({
+        palette: {
+            mode: "dark"
+        }
+    });
+
     return (
-        <div className={classes.app}>
-            <div className={classes.appContainer}>
-                {getMusicFileInput()}
+        <ThemeProvider theme={theme}>
+            <div className={classes.app}>
+                <div className={classes.appContainer}>
+                    <Routes>
+                        <Route
+                            index
+                            element={
+                                <Library appSettings={appSettings} playSong={playSong} />
+                            }
+                        />
+                        <Route
+                            path="play-file"
+                            element={
+                                <PlayFile
+                                    playingSound={playingSound}
+                                    clearPlayingSong={clearPlayingSong}
+                                    setPlayingSoundMetadata={setPlayingSoundMetadata}
+                                    playSong={playSong}
+                                />
+                            }
+                        />
+                    </Routes>
+                    <Drawer
+                        className={classes.navDrawer}
+                        PaperProps={{
+                            className: classes.drawerPaper
+                        }}
+                        variant="permanent"
+                        anchor="left"
+                    >
+                        <Toolbar />
+                        <Divider />
+                        <List>
+                            <ListItem disablePadding>
+                                <Link className={classes.link} to="/">
+                                    <ListItemButton>
+                                        <ListItemIcon>
+                                            <QueueMusic />
+                                        </ListItemIcon>
+                                        <ListItemText primary="Library" />
+                                    </ListItemButton>
+                                </Link>
+                            </ListItem>
+                            <ListItem disablePadding>
+                                <Link className={classes.link} to="play-file">
+                                    <ListItemButton>
+                                        <ListItemIcon>
+                                            <FileUpload />
+                                        </ListItemIcon>
+                                        <ListItemText primary="Play File" />
+                                    </ListItemButton>
+                                </Link>
+                            </ListItem>
+                        </List>
+                        <Divider />
+                    </Drawer>
+                    {getPlayingSongInfo()}
+                </div>
             </div>
-        </div>
+        </ThemeProvider>
     );
 }
 
