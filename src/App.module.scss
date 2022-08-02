@@ -17,9 +17,13 @@
     position: absolute;
     bottom: 1px;
     width: 100%;
+    z-index: 9999;
 }
 
 .mainContent {
     width: calc(100% - 8em);
     align-self: flex-end;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
 }

@@ -16,11 +16,6 @@ import { getFilenameFromPath } from './utility/FilePathUtils';
 window.Buffer = Buffer;
 window.process = process;
 
-interface SongMetadataMapping {
-    id: string,
-    metadata: mm.IAudioMetadata
-}
-
 function App() {
     const [playingSound, setPlayingSound] = useState<Howl>();
     const [nameOfFile, setNameOfFile] = useState<string>();
@@ -32,32 +27,7 @@ function App() {
 
     useEffect(() => {
         window.electron.getSettings().then((settings) => {
-            Promise.all(
-                settings.songs.map(async (song) => {
-                    const metadata = await window.electron.getFileMetadata(song.filename);
-                    const metadataMapping: SongMetadataMapping = {
-                        id: song.id,
-                        metadata: metadata
-                    };
-                    return metadataMapping;
-                })
-            ).then((metadataMappings: SongMetadataMapping[]) => {
-                const metadataDict = new Map<string, mm.IAudioMetadata>();
-                metadataMappings.forEach((metadataMapping) =>
-                    metadataDict.set(metadataMapping.id, metadataMapping.metadata));
-                return metadataDict;
-            }).then((metadataDict: Map<string, mm.IAudioMetadata>) => {
-                const parsedSettings: AppSettings = {
-                    songs: settings.songs.map((song) => {
-                        return {
-                            filename: song.filename,
-                            metadata: metadataDict.get(song.id)
-                        };
-                    })
-                };
-
-                setAppSettings(parsedSettings);
-            });
+            setAppSettings(settings);
         });
     }, []);
 
@@ -94,14 +64,20 @@ function App() {
         setTotalDuration(null);
     }
     
-    const playSong = (filepath: string) => {
-        const filename = getFilenameFromPath(filepath);
+    const playSong = (filepath: string, filename?: string) => {
+        if (filename === undefined) {
+            filename = getFilenameFromPath(filepath);
+        }
+
         const howlerSound = new Howl({ src: [filepath], preload: true });
 
         howlerSound.once('play', () => {
             setPlayingSound(howlerSound);
             setNameOfFile(filename);
             setTotalDuration(howlerSound.duration());
+            if (isPaused) {
+                setIsPaused(false);
+            }
         });
 
         howlerSound.once('end', () => {
@@ -110,10 +86,6 @@ function App() {
         
         if (playingSound) {
             playingSound.stop();
-        }
-
-        if (isPaused) {
-            setIsPaused(false);
         }
 
         howlerSound.play();

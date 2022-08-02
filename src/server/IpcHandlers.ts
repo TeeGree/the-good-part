@@ -1,5 +1,5 @@
 import { ipcMain, app } from 'electron';
-import { AppSettingsFromFile } from '../models/AppSettings';
+import { AppSettings, AppSettingsFromFile } from '../models/AppSettings';
 import { getFilenameFromPath } from '../utility/FilePathUtils';
 import * as fs from 'fs';
 import * as mm from 'music-metadata';
@@ -28,10 +28,10 @@ export const setupIpcHandlers = () => {
     });
 }
 
-const getSettings = (): Promise<AppSettingsFromFile> => {
+const getSettings = (): Promise<AppSettings> => {
     return new Promise((resolve, reject) => {
         const configFile = './the-good-part.settings.json';
-        fs.readFile(configFile, 'utf8', (fileNotFoundError, file) => {
+        fs.readFile(configFile, 'utf8', async (fileNotFoundError, file) => {
             if (fileNotFoundError) {
                 const defaultSettings: AppSettingsFromFile = {
                     songs: []
@@ -41,14 +41,50 @@ const getSettings = (): Promise<AppSettingsFromFile> => {
                         reject(err);
                     }
                     
-                    resolve(defaultSettings);
+                    resolve(defaultSettings as unknown as AppSettings);
                 });
             } else {
                 const settings: AppSettingsFromFile = JSON.parse(file);
-                resolve(settings);
+                const parsedSettings = await parseAppSettings(settings);
+                resolve(parsedSettings);
             }
         });
     });
+}
+
+interface SongMetadataMapping {
+    id: string,
+    metadata: mm.IAudioMetadata
+}
+
+const parseAppSettings = async (appSettings: AppSettingsFromFile) => {
+    const metadataMappings = await Promise.all(
+        appSettings.songs.map(async (song) => {
+            const metadata = await getFileMetadata(song.filename);
+            const metadataMapping: SongMetadataMapping = {
+                id: song.id,
+                metadata: metadata
+            };
+            return metadataMapping;
+        })
+    );
+
+    const metadataDict = new Map<string, mm.IAudioMetadata>();
+
+    metadataMappings.forEach((metadataMapping) =>
+        metadataDict.set(metadataMapping.id, metadataMapping.metadata));
+
+    const parsedSettings: AppSettings = {
+        songs: appSettings.songs.map((song) => {
+            return {
+                filename: song.filename,
+                fullPath: getFullPath(song.filename),
+                metadata: metadataDict.get(song.id)
+            };
+        })
+    };
+
+    return parsedSettings;
 }
 
 const getSongInfo = async (filepath: string): Promise<SongInfo> => {
@@ -58,6 +94,7 @@ const getSongInfo = async (filepath: string): Promise<SongInfo> => {
 
     const songInfo: SongInfo = {
         filename: filename,
+        fullPath: filepath,
         metadata: metadata
     };
 
@@ -65,6 +102,11 @@ const getSongInfo = async (filepath: string): Promise<SongInfo> => {
 }
 
 const getFileMetadata = async (filename: string): Promise<mm.IAudioMetadata> => {
+    const fullpath = getFullPath(filename);
+    return await mm.parseFile(fullpath);
+}
+
+const getFullPath = (filename: string) => {
     const electronPath = app.getAppPath();
-    return await mm.parseFile(`${electronPath}\\public\\${filename}`);
+    return `${electronPath}\\public\\${filename}`;
 }

@@ -10,13 +10,13 @@ interface FileUploadProps {
 export const FileUpload: React.FC<FileUploadProps> = (props: FileUploadProps) => {
     
     return (
-        <>
+        <div className={classes.playFileContainer}>
             <input id="fileUpload" type="file" className={classes.hidden} onChange={props.onFileSelection} />
             <label htmlFor="fileUpload">
                 <Button variant="contained" color="primary" component="span">
                     {props.label}
                 </Button>
             </label>
-        </>
+        </div>
     );
 };
