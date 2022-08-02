@@ -1,5 +1,5 @@
-import { ipcMain } from 'electron';
-import { AppSettings } from '../models/AppSettings';
+import { ipcMain, app } from 'electron';
+import { AppSettingsFromFile } from '../models/AppSettings';
 import { getFilenameFromPath } from '../utility/FilePathUtils';
 import * as fs from 'fs';
 import * as mm from 'music-metadata';
@@ -28,12 +28,12 @@ export const setupIpcHandlers = () => {
     });
 }
 
-const getSettings = (): Promise<AppSettings> => {
+const getSettings = (): Promise<AppSettingsFromFile> => {
     return new Promise((resolve, reject) => {
         const configFile = './the-good-part.settings.json';
         fs.readFile(configFile, 'utf8', (fileNotFoundError, file) => {
             if (fileNotFoundError) {
-                const defaultSettings: AppSettings = {
+                const defaultSettings: AppSettingsFromFile = {
                     songs: []
                 };
                 fs.writeFile(configFile, JSON.stringify(defaultSettings), (err) => {
@@ -44,7 +44,7 @@ const getSettings = (): Promise<AppSettings> => {
                     resolve(defaultSettings);
                 });
             } else {
-                const settings: AppSettings = JSON.parse(file);
+                const settings: AppSettingsFromFile = JSON.parse(file);
                 resolve(settings);
             }
         });
@@ -58,14 +58,13 @@ const getSongInfo = async (filepath: string): Promise<SongInfo> => {
 
     const songInfo: SongInfo = {
         filename: filename,
-        fullPath: filepath,
-        relativePath: `/${filename}`,
         metadata: metadata
     };
 
     return songInfo;
 }
 
-const getFileMetadata = async (filepath: string): Promise<mm.IAudioMetadata> => {
-    return await mm.parseFile(filepath);
+const getFileMetadata = async (filename: string): Promise<mm.IAudioMetadata> => {
+    const electronPath = app.getAppPath();
+    return await mm.parseFile(`${electronPath}\\public\\${filename}`);
 }

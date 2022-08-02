@@ -1,11 +1,12 @@
+import { SongInfo } from "./SongInfo"
+
 export interface SongInfoFromSettings {
     id: string,
-    relativePath: string,
-    fullPath: string
+    filename: string
 }
 
 export interface AppSettings {
-    songs: SongInfoFromSettings[]
+    songs: SongInfo[]
 }
 
 export interface AppSettingsFromFile {

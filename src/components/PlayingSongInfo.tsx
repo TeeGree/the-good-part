@@ -4,6 +4,7 @@ import classes from './PlayingSongInfo.module.scss';
 import PauseIcon from '@mui/icons-material/Pause';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import IconButton from '@mui/material/IconButton';
+import { parseNumberAsMinutesText } from '../utility/StringUtils';
 
 interface PlayingSongInfoProps {
     nameOfFile?: string,
@@ -55,20 +56,6 @@ export const PlayingSongInfo: React.FC<PlayingSongInfoProps> = (props: PlayingSo
                 {props.isPaused ? (<PlayArrowIcon />) : (<PauseIcon />)}
             </IconButton>
         );
-    }
-
-    const padSeconds = (seconds: number): string => {
-        if (seconds < 10) {
-            return `0${seconds}`;
-        }
-        return seconds.toString();
-    }
-
-    const parseNumberAsMinutesText = (time: number): string => {
-        const flooredTime = Math.floor(time);
-        const minutes = Math.floor(flooredTime / 60);
-        const seconds = padSeconds(flooredTime % 60);
-        return `${minutes}:${seconds}`;
     }
 
     const getProgressBar = (): JSX.Element => {

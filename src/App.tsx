@@ -16,6 +16,11 @@ import { getFilenameFromPath } from './utility/FilePathUtils';
 window.Buffer = Buffer;
 window.process = process;
 
+interface SongMetadataMapping {
+    id: string,
+    metadata: mm.IAudioMetadata
+}
+
 function App() {
     const [playingSound, setPlayingSound] = useState<Howl>();
     const [nameOfFile, setNameOfFile] = useState<string>();
@@ -27,7 +32,32 @@ function App() {
 
     useEffect(() => {
         window.electron.getSettings().then((settings) => {
-            setAppSettings(settings);
+            Promise.all(
+                settings.songs.map(async (song) => {
+                    const metadata = await window.electron.getFileMetadata(song.filename);
+                    const metadataMapping: SongMetadataMapping = {
+                        id: song.id,
+                        metadata: metadata
+                    };
+                    return metadataMapping;
+                })
+            ).then((metadataMappings: SongMetadataMapping[]) => {
+                const metadataDict = new Map<string, mm.IAudioMetadata>();
+                metadataMappings.forEach((metadataMapping) =>
+                    metadataDict.set(metadataMapping.id, metadataMapping.metadata));
+                return metadataDict;
+            }).then((metadataDict: Map<string, mm.IAudioMetadata>) => {
+                const parsedSettings: AppSettings = {
+                    songs: settings.songs.map((song) => {
+                        return {
+                            filename: song.filename,
+                            metadata: metadataDict.get(song.id)
+                        };
+                    })
+                };
+
+                setAppSettings(parsedSettings);
+            });
         });
     }, []);
 
@@ -121,26 +151,28 @@ function App() {
     return (
         <div className={classes.app}>
             <div className={classes.appContainer}>
-                <Routes>
-                    <Route
-                        path="/"
-                        element={
-                            <Library appSettings={appSettings} playSong={playSong} />
-                        }
-                    />
-                    <Route
-                        path="play-file"
-                        element={
-                            <PlayFile
-                                playingSound={playingSound}
-                                clearPlayingSong={clearPlayingSong}
-                                setPlayingSoundMetadata={setPlayingSoundMetadata}
-                                playSong={playSong}
-                            />
-                        }
-                    />
-                    <Route path="*" element={<Navigate to="/" replace />} />
-                </Routes>
+                <div className={classes.mainContent}>
+                    <Routes>
+                        <Route
+                            path="/"
+                            element={
+                                <Library appSettings={appSettings} playSong={playSong} />
+                            }
+                        />
+                        <Route
+                            path="play-file"
+                            element={
+                                <PlayFile
+                                    playingSound={playingSound}
+                                    clearPlayingSong={clearPlayingSong}
+                                    setPlayingSoundMetadata={setPlayingSoundMetadata}
+                                    playSong={playSong}
+                                />
+                            }
+                        />
+                        <Route path="*" element={<Navigate to="/" replace />} />
+                    </Routes>
+                </div>
                 <NavPanel />
                 {getPlayingSongInfo()}
             </div>

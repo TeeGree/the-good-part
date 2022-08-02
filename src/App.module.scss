@@ -9,7 +9,6 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
     font-size: calc(10px + 2vmin);
     color: white;
 }
@@ -18,4 +17,9 @@
     position: absolute;
     bottom: 1px;
     width: 100%;
+}
+
+.mainContent {
+    width: calc(100% - 8em);
+    align-self: flex-end;
 }
