@@ -5,6 +5,5 @@ import { SongInfo } from '../src/models/SongInfo'
 
 contextBridge.exposeInMainWorld('electron', {
     getFileMetadata: (filepath: string): Promise<mm.IAudioMetadata> => ipcRenderer.invoke('get-file-metadata', filepath),
-    getSongInfo: (filepath: string): Promise<SongInfo> => ipcRenderer.invoke('get-song-info', filepath),
     getSettings: (): Promise<AppSettings> => ipcRenderer.invoke('get-settings')
 });

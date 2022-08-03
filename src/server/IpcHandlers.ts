@@ -1,22 +1,13 @@
 import { ipcMain, app } from 'electron';
 import { AppSettings, AppSettingsFromFile } from '../models/AppSettings';
-import { getFilenameFromPath } from '../utility/FilePathUtils';
 import * as fs from 'fs';
 import * as mm from 'music-metadata';
-import { SongInfo } from '../models/SongInfo';
 
 export const setupIpcHandlers = () => {
     ipcMain.handle('get-settings', async (_) => {
         return await getSettings()
             .catch(() => {
                 return 'Error reading settings file';
-            });
-    });
-
-    ipcMain.handle('get-song-info', async (_, filepath: string) => {
-        return await getSongInfo(filepath)
-            .catch(() => {
-                return 'Error getting song info';
             });
     });
 
@@ -77,6 +68,7 @@ const parseAppSettings = async (appSettings: AppSettingsFromFile) => {
     const parsedSettings: AppSettings = {
         songs: appSettings.songs.map((song) => {
             return {
+                id: song.id,
                 filename: song.filename,
                 fullPath: getFullPath(song.filename),
                 metadata: metadataDict.get(song.id)
@@ -85,20 +77,6 @@ const parseAppSettings = async (appSettings: AppSettingsFromFile) => {
     };
 
     return parsedSettings;
-}
-
-const getSongInfo = async (filepath: string): Promise<SongInfo> => {
-    const metadata = await mm.parseFile(filepath);
-
-    const filename = getFilenameFromPath(filepath);
-
-    const songInfo: SongInfo = {
-        filename: filename,
-        fullPath: filepath,
-        metadata: metadata
-    };
-
-    return songInfo;
 }
 
 const getFileMetadata = async (filename: string): Promise<mm.IAudioMetadata> => {

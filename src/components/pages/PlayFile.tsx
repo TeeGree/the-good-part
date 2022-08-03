@@ -7,7 +7,7 @@ interface PlayFileProps {
     playingSound: Howl | undefined,
     clearPlayingSong: () => void,
     setPlayingSoundMetadata: (metadata: mm.IAudioMetadata) => void,
-    playSong: (filepath: string) => void
+    playSong: (filepath: string, songId?: string, filename?: string) => void
 }
 
 export const PlayFile: React.FC<PlayFileProps> = (props: PlayFileProps) => {

@@ -10,11 +10,11 @@ interface PlayingSongInfoProps {
     nameOfFile?: string,
     fileMetadata?: mm.IAudioMetadata
     playingSound?: Howl,
-    onPause: () => void;
-    onPlay: () => void;
-    isPaused: boolean;
-    currentPlaybackTime: number | null;
-    totalDuration: number | null;
+    onPause: () => void,
+    onPlay: () => void,
+    isPaused: boolean,
+    currentPlaybackTime: number | null,
+    totalDuration: number | null
 };
 
 export const PlayingSongInfo: React.FC<PlayingSongInfoProps> = (props: PlayingSongInfoProps) => {

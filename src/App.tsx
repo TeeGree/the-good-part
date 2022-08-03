@@ -20,6 +20,7 @@ function App() {
     const [playingSound, setPlayingSound] = useState<Howl>();
     const [nameOfFile, setNameOfFile] = useState<string>();
     const [playingSoundMetadata, setPlayingSoundMetadata] = useState<mm.IAudioMetadata>();
+    const [playingSongId, setPlayingSongId] = useState<string>();
     const [currentPlaybackTime, setCurrentPlaybackTime] = useState<number | null>(null);
     const [totalDuration, setTotalDuration] = useState<number | null>(null);
     const [isPaused, setIsPaused] = useState<boolean>(false);
@@ -62,9 +63,10 @@ function App() {
         setPlayingSound(undefined);
         setCurrentPlaybackTime(null);
         setTotalDuration(null);
+        setPlayingSongId(undefined);
     }
     
-    const playSong = (filepath: string, filename?: string) => {
+    const playSong = (filepath: string, songId?: string, filename?: string) => {
         if (filename === undefined) {
             filename = getFilenameFromPath(filepath);
         }
@@ -75,6 +77,12 @@ function App() {
             setPlayingSound(howlerSound);
             setNameOfFile(filename);
             setTotalDuration(howlerSound.duration());
+            if (songId) {
+                setPlayingSongId(songId);
+            } else {
+                setPlayingSongId(undefined);
+            }
+            
             if (isPaused) {
                 setIsPaused(false);
             }
@@ -128,7 +136,14 @@ function App() {
                         <Route
                             path="/"
                             element={
-                                <Library appSettings={appSettings} playSong={playSong} />
+                                <Library
+                                    appSettings={appSettings}
+                                    playSong={playSong}
+                                    onPause={pausePlayingSong}
+                                    onResume={resumePlayingSong}
+                                    isPaused={isPaused}
+                                    playingSongId={playingSongId}
+                                />
                             }
                         />
                         <Route

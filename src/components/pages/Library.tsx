@@ -10,14 +10,55 @@ import { SongInfo } from '../../models/SongInfo';
 import { parseNumberAsMinutesText } from '../../utility/StringUtils';
 import classes from './Library.module.scss';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import PauseIcon from '@mui/icons-material/Pause';
 import IconButton from '@mui/material/IconButton';
 
 interface LibraryProps {
     appSettings: AppSettings | undefined,
-    playSong: (filepath: string, filename?: string) => void
+    playSong: (filepath: string, songId: string, filename?: string) => void,
+    playingSongId: string | undefined,
+    isPaused: boolean,
+    onPause: () => void,
+    onResume: () => void
 }
 
 export const Library: React.FC<LibraryProps> = (props: LibraryProps) => {
+
+    const getPlaybackIcon = (song: SongInfo) => {
+        // This row's song is not playing.
+        if (props.playingSongId !== song.id) {
+            return (
+                <IconButton
+                    color="inherit"
+                    onClick={() => props.playSong(`.\\${song.filename}`, song.id, song.metadata?.common.title)}
+                >
+                    <PlayArrowIcon />
+                </IconButton>
+            );
+        }
+
+        // This row's song is playing, but paused.
+        if (props.isPaused) {
+            return (
+                <IconButton
+                    color="inherit"
+                    onClick={props.onResume}
+                >
+                    <PlayArrowIcon />
+                </IconButton>
+            );
+        }
+        
+        // This row's song is playing and not paused.
+        return (
+            <IconButton
+                color="inherit"
+                onClick={props.onPause}
+            >
+                <PauseIcon />
+            </IconButton>
+        );
+    }
 
     const getRowForSong = (index: number, song: SongInfo) => {
         if (song.metadata === undefined) {
@@ -30,12 +71,7 @@ export const Library: React.FC<LibraryProps> = (props: LibraryProps) => {
         return (
             <TableRow key={index}>
                 <TableCell className={classes.tableCell}>
-                    <IconButton
-                        color="inherit"
-                        onClick={() => props.playSong(`.\\${song.filename}`, commonMetadata.title)}
-                    >
-                        <PlayArrowIcon />
-                    </IconButton>
+                    {getPlaybackIcon(song)}
                 </TableCell>
                 <TableCell className={classes.tableCell}>{commonMetadata.title}</TableCell>
                 <TableCell className={classes.tableCell}>{commonMetadata.artist}</TableCell>

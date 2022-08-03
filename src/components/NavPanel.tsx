@@ -1,4 +1,5 @@
-import { FileUpload, QueueMusic } from '@mui/icons-material';
+import QueueMusic from '@mui/icons-material/QueueMusic';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import Divider from '@mui/material/Divider';
 import Drawer from '@mui/material/Drawer';
 import List from '@mui/material/List';
@@ -38,7 +39,7 @@ export const NavPanel: React.FC<{}> = () => {
                     <Link className={classes.link} to="play-file">
                         <ListItemButton>
                             <ListItemIcon className={classes.icon}>
-                                <FileUpload />
+                                <PlayArrowIcon />
                             </ListItemIcon>
                             <ListItemText primary="Play File" />
                         </ListItemButton>
