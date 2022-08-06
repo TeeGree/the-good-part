@@ -8,7 +8,7 @@ import classes from './App.module.scss';
 import { AppSettings } from './models/AppSettings';
 import { Routes, Route, Navigate } from "react-router-dom";
 import { Library } from './components/pages/Library';
-import { PlayFile } from './components/pages/PlayFile';
+import { SelectFile } from './components/pages/SelectFile';
 import { NavPanel } from './components/NavPanel';
 import { getFilenameFromPath } from './utility/FilePathUtils';
 
@@ -128,6 +128,30 @@ function App() {
         return (<></>);
     }
 
+    const playFile = async (file: File) => {
+        if (playingSound) {
+            playingSound.stop();
+            clearPlayingSong();
+        }
+        
+        const metadata = await mm.parseBlob(file);
+        setPlayingSoundMetadata(metadata);
+        const reader = new FileReader();
+        reader.addEventListener('load', (event: ProgressEvent<FileReader>) => {
+            if (event.target !== null) {
+                playSong(event.target.result as string);
+            }
+        });
+
+        reader.readAsDataURL(file);
+    }
+
+    const uploadFile = async (file: File) => {
+        await window.electron.uploadFile(file.path);
+        const settings = await window.electron.getSettings();
+        setAppSettings(settings);
+    }
+
     return (
         <div className={classes.app}>
             <div className={classes.appContainer}>
@@ -147,13 +171,20 @@ function App() {
                             }
                         />
                         <Route
+                            path="upload-file"
+                            element={
+                                <SelectFile
+                                    onLoadFile={uploadFile}
+                                    fileInputLabel="Choose music file to add to library"
+                                />
+                            }
+                        />
+                        <Route
                             path="play-file"
                             element={
-                                <PlayFile
-                                    playingSound={playingSound}
-                                    clearPlayingSong={clearPlayingSong}
-                                    setPlayingSoundMetadata={setPlayingSoundMetadata}
-                                    playSong={playSong}
+                                <SelectFile
+                                    onLoadFile={playFile}
+                                    fileInputLabel="Choose music file to play"
                                 />
                             }
                         />
