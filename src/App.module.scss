@@ -1,3 +1,7 @@
+@use 'components/NavPanel.module.scss';
+
+$playingSongInfoHeight: 102px;
+
 .app {
     text-align: center;
 }
@@ -6,24 +10,34 @@
     position: relative;
     background-color: #282c34;
     min-height: 100vh;
+    max-height: 100vh;
     display: flex;
     flex-direction: column;
     align-items: center;
     font-size: calc(10px + 2vmin);
     color: white;
+    flex: 1;
 }
 
 .playingSongInfo {
-    position: absolute;
-    bottom: 1px;
     width: 100%;
+    font-size: medium;
+    height: $playingSongInfoHeight;
     z-index: 9999;
+    align-self: flex-end;
+    justify-content: end;
+    display: flex;
+    flex-direction: column;
+    margin-top: auto;
+    flex-shrink: 0;
 }
 
 .mainContent {
-    width: calc(100% - 8em);
+    width: calc(100% - NavPanel.$navBarWidth);
+    min-height: 0;
+    flex-basis: auto;
     align-self: flex-end;
-    height: 100vh;
     display: flex;
     justify-content: center;
+    flex-shrink: 1;
 }

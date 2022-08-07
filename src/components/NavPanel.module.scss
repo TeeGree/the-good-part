@@ -1,6 +1,7 @@
+$navBarWidth: 172px;
+
 .navDrawer {
     width: 3em;
-    flex-shrink: 0;
     color: inherit !important;
     background-color: inherit !important;
 }
@@ -8,7 +9,7 @@
 .drawerPaper {
     background-color: inherit !important;
     color: inherit !important;
-    width: 8em;
+    width: $navBarWidth;
 }
 
 .link {
