@@ -1,4 +1,7 @@
+$playingSongInfoHeight: 102px;
+
 .songInfoContainer {
+    position: relative;
     width: 100%;
     background-color: darkslateblue;
 }
@@ -13,4 +16,35 @@
     height: 100%;
     background-color: purple;
     border-radius: inherit;
+}
+
+.songTitleContainer {
+    width: 20%;
+    text-align: left;
+    margin-left: 1em;
+    margin-bottom: 1em;
+    display: inline-block;
+}
+
+.songTitle {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    font-size: 18px;
+}
+
+.artistName {
+    font-size: 14px;
+    color: lightgray;
+}
+
+.songInfoParts {
+    display: flex;
+}
+
+.playIconContainer {
+    position: sticky;
+    left: calc(50vw - 10%);
+    width: 20%;
+    bottom: 25%;
 }
