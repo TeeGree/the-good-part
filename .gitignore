@@ -27,3 +27,5 @@ the-good-part.settings.json
 
 # user loaded songs
 public/*.mp3
+
+/dist

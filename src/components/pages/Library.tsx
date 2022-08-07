@@ -15,7 +15,7 @@ import IconButton from '@mui/material/IconButton';
 
 interface LibraryProps {
     appSettings: AppSettings | undefined,
-    playSong: (filepath: string, songId: string, filename?: string) => void,
+    playSong: (songId: string) => void,
     playingSongId: string | undefined,
     isPaused: boolean,
     onPause: () => void,
@@ -30,7 +30,7 @@ export const Library: React.FC<LibraryProps> = (props: LibraryProps) => {
             return (
                 <IconButton
                     color="inherit"
-                    onClick={() => props.playSong(`.\\${song.filename}`, song.id, song.metadata?.common.title)}
+                    onClick={() => props.playSong(song.id)}
                 >
                     <PlayArrowIcon />
                 </IconButton>

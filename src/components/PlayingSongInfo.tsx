@@ -1,5 +1,5 @@
 import { Howl } from 'howler';
-import * as mm from 'music-metadata-browser';
+import { IAudioMetadata } from 'music-metadata';
 import classes from './PlayingSongInfo.module.scss';
 import PauseIcon from '@mui/icons-material/Pause';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
@@ -8,7 +8,7 @@ import { parseNumberAsMinutesText } from '../utility/StringUtils';
 
 interface PlayingSongInfoProps {
     nameOfFile?: string,
-    fileMetadata?: mm.IAudioMetadata
+    fileMetadata?: IAudioMetadata
     playingSound?: Howl,
     onPause: () => void,
     onPlay: () => void,

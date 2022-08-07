@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { Howl } from 'howler';
-import * as mm from 'music-metadata-browser';
 import { Buffer } from 'buffer';
 import * as process from 'process';
 import { PlayingSongInfo } from './components/PlayingSongInfo';
@@ -8,9 +7,10 @@ import classes from './App.module.scss';
 import { AppSettings } from './models/AppSettings';
 import { Routes, Route, Navigate } from "react-router-dom";
 import { Library } from './components/pages/Library';
-import { SelectFile } from './components/pages/SelectFile';
+import { UploadFile } from './components/pages/UploadFile';
 import { NavPanel } from './components/NavPanel';
 import { getFilenameFromPath } from './utility/FilePathUtils';
+import { SongInfo } from './models/SongInfo';
 
 // Needed to polyfill dependencies that have been removed from Node.
 window.Buffer = Buffer;
@@ -18,8 +18,8 @@ window.process = process;
 
 function App() {
     const [playingSound, setPlayingSound] = useState<Howl>();
+    const [playingSong, setPlayingSong] = useState<SongInfo>();
     const [nameOfFile, setNameOfFile] = useState<string>();
-    const [playingSoundMetadata, setPlayingSoundMetadata] = useState<mm.IAudioMetadata>();
     const [playingSongId, setPlayingSongId] = useState<string>();
     const [currentPlaybackTime, setCurrentPlaybackTime] = useState<number | null>(null);
     const [totalDuration, setTotalDuration] = useState<number | null>(null);
@@ -48,32 +48,27 @@ function App() {
         return () => clearInterval(interval);
     }, [playingSound]);
 
-    useEffect(() => {
-        if (playingSound === undefined) {
-            return;
-        }
-        if (isPaused) {
-            playingSound?.pause();
-        } else {
-            playingSound?.play();
-        }
-    }, [isPaused]);
-
     const clearPlayingSong = () => {
         setPlayingSound(undefined);
         setCurrentPlaybackTime(null);
         setTotalDuration(null);
         setPlayingSongId(undefined);
+        setPlayingSong(undefined);
     }
     
-    const playSong = (filepath: string, songId?: string, filename?: string) => {
-        if (filename === undefined) {
-            filename = getFilenameFromPath(filepath);
+    const playSong = (songId: string) => {
+        const song = appSettings?.songMap.get(songId);
+        if (song === undefined) {
+            throw Error('Song ID is invalid!');
         }
+
+        const filepath = `.\\${song.filename}`
+        const filename = getFilenameFromPath(filepath);
 
         const howlerSound = new Howl({ src: [filepath], preload: true });
 
         howlerSound.once('play', () => {
+            setPlayingSong(song);
             setPlayingSound(howlerSound);
             setNameOfFile(filename);
             setTotalDuration(howlerSound.duration());
@@ -90,6 +85,7 @@ function App() {
 
         howlerSound.once('end', () => {
             setPlayingSound(undefined);
+            setPlayingSong(undefined);
         })
         
         if (playingSound) {
@@ -100,10 +96,12 @@ function App() {
     }
 
     const pausePlayingSong = () => {
+        playingSound?.pause();
         setIsPaused(true);
     }
 
     const resumePlayingSong = () => {
+        playingSound?.play();
         setIsPaused(false);
     }
 
@@ -113,7 +111,7 @@ function App() {
                 <div className={classes.playingSongInfo}>
                     <PlayingSongInfo
                         nameOfFile={nameOfFile}
-                        fileMetadata={playingSoundMetadata}
+                        fileMetadata={playingSong?.metadata}
                         playingSound={playingSound}
                         onPause={pausePlayingSong}
                         onPlay={resumePlayingSong}
@@ -126,24 +124,6 @@ function App() {
         }
         
         return (<></>);
-    }
-
-    const playFile = async (file: File) => {
-        if (playingSound) {
-            playingSound.stop();
-            clearPlayingSong();
-        }
-        
-        const metadata = await mm.parseBlob(file);
-        setPlayingSoundMetadata(metadata);
-        const reader = new FileReader();
-        reader.addEventListener('load', (event: ProgressEvent<FileReader>) => {
-            if (event.target !== null) {
-                playSong(event.target.result as string);
-            }
-        });
-
-        reader.readAsDataURL(file);
     }
 
     const uploadFile = async (file: File) => {
@@ -173,18 +153,9 @@ function App() {
                         <Route
                             path="upload-file"
                             element={
-                                <SelectFile
+                                <UploadFile
                                     onLoadFile={uploadFile}
                                     fileInputLabel="Choose music file to add to library"
-                                />
-                            }
-                        />
-                        <Route
-                            path="play-file"
-                            element={
-                                <SelectFile
-                                    onLoadFile={playFile}
-                                    fileInputLabel="Choose music file to play"
                                 />
                             }
                         />

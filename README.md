@@ -1,5 +1,9 @@
 # What it is
-This is little more than a glint in my eye at this point. In the future, this will hopefully be a desktop music player app using Electron, React, TypeScript, and Material UI.
+A desktop music player app using Electron, React, TypeScript, and Material UI.
+
+# Usage
+1. "Upload" mp3 files from the "Upload File" page.
+2. Play any uploaded files from the "Library" page.
 
 # How to run
 Install dependencies:

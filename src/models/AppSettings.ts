@@ -6,7 +6,8 @@ export interface SongInfoFromSettings {
 }
 
 export interface AppSettings {
-    songs: SongInfo[]
+    songs: SongInfo[],
+    songMap: Map<string, SongInfo>
 }
 
 export interface AppSettingsFromFile {

@@ -2667,13 +2667,6 @@ abab@^2.0.3, abab@^2.0.5:
   resolved "https://registry.yarnpkg.com/abab/-/abab-2.0.6.tgz#41b80f2c871d19686216b82309231cfd3cb3d291"
   integrity sha512-j2afSsaIENvHZN2B8GOpF566vZ5WVk5opAiMTvWgaQT8DkbOqsTfvNAvHoRGU2zzP8cPoqys+xHTRDWW8L+/BA==
 
-abort-controller@^3.0.0:
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/abort-controller/-/abort-controller-3.0.0.tgz#eaf54d53b62bae4138e809ca225c8439a6efb392"
-  integrity sha512-h8lQ8tacZYnR3vNQTgibj+tODHI5/+l06Au2Pcriv/Gmet0eaj4TwWH41sO9wnHDiQsEj19q0drzdWdeAHtweg==
-  dependencies:
-    event-target-shim "^5.0.0"
-
 accepts@~1.3.4, accepts@~1.3.5, accepts@~1.3.8:
   version "1.3.8"
   resolved "https://registry.yarnpkg.com/accepts/-/accepts-1.3.8.tgz#0bf0be125b67014adcb0b0921e62db7bffe16b2e"
@@ -5021,11 +5014,6 @@ etag@~1.8.1:
   resolved "https://registry.yarnpkg.com/etag/-/etag-1.8.1.tgz#41ae2eeb65efa62268aebfea83ac7d79299b0887"
   integrity sha512-aIL5Fx7mawVa300al2BnEE4iNvo1qETxLrPI/o05L7z6go7fCw1J6EQmbK4FmJ2AS7kgVF/KEZWufBfdClMcPg==
 
-event-target-shim@^5.0.0:
-  version "5.0.1"
-  resolved "https://registry.yarnpkg.com/event-target-shim/-/event-target-shim-5.0.1.tgz#5d4d3ebdf9583d63a5333ce2deb7480ab2b05789"
-  integrity sha512-i/2XbnSz/uxRCU6+NdVJgKWDTM427+MqYbkQzD321DuCQJUqOuJKIA0IM2+W2xtYHdKOmZ4dR6fExsd4SXL+WQ==
-
 eventemitter3@^4.0.0:
   version "4.0.7"
   resolved "https://registry.yarnpkg.com/eventemitter3/-/eventemitter3-4.0.7.tgz#2de9b68f6528d5644ef5c59526a1b4a07306169f"
@@ -5187,10 +5175,10 @@ file-loader@^6.2.0:
     loader-utils "^2.0.0"
     schema-utils "^3.0.0"
 
-file-type@16.5.3:
-  version "16.5.3"
-  resolved "https://registry.yarnpkg.com/file-type/-/file-type-16.5.3.tgz#474b7e88c74724046abb505e9b8ed4db30c4fc06"
-  integrity sha512-uVsl7iFhHSOY4bEONLlTK47iAHtNsFHWP5YE4xJfZ4rnX7S1Q3wce09XgqSC7E/xh8Ncv/be1lNoyprlUH/x6A==
+file-type@^16.5.4:
+  version "16.5.4"
+  resolved "https://registry.yarnpkg.com/file-type/-/file-type-16.5.4.tgz#474fb4f704bee427681f98dd390058a172a6c2fd"
+  integrity sha512-/yFHK0aGjFEgDJjEKP0pWCplsPFPhwyfwevf/pVxiN0tmE4L9LmwWxWukdJSHdoCli4VgQLehjJtwQBnqmsKcw==
   dependencies:
     readable-web-to-node-stream "^3.0.0"
     strtok3 "^6.2.4"
@@ -7364,26 +7352,15 @@ multicast-dns@^7.2.5:
     dns-packet "^5.2.2"
     thunky "^1.0.2"
 
-music-metadata-browser@^2.5.7:
-  version "2.5.7"
-  resolved "https://registry.yarnpkg.com/music-metadata-browser/-/music-metadata-browser-2.5.7.tgz#c1c011ada6e5ab11f77ed4225c1d24bc5ea20aca"
-  integrity sha512-00q3KYNVOSsLDzxE5/wS2RzpkaUXT5V3wURJqsaj2K7+v5f7oWvy/+7PekekN2UnbvXYdxzjUMVf+NPNX47gpQ==
-  dependencies:
-    buffer "^6.0.3"
-    debug "^4.3.4"
-    music-metadata "^7.12.4"
-    readable-stream "^4.0.0"
-    readable-web-to-node-stream "^3.0.2"
-
-music-metadata@^7.12.4:
-  version "7.12.4"
-  resolved "https://registry.yarnpkg.com/music-metadata/-/music-metadata-7.12.4.tgz#369c15a70cc66ef240f395276d13dded77a045df"
-  integrity sha512-hn4DsDYQUeq4WDDh7MD/nSj6CaZMywuD/4Ywq6veeh4Q5KZw4A2yLY8gUzsEWf/ctdtV9Lj066ihkU7Nk7EXIA==
+music-metadata@7.12.6:
+  version "7.12.6"
+  resolved "https://registry.yarnpkg.com/music-metadata/-/music-metadata-7.12.6.tgz#a13739c518358c7d3ce3208b372a7ff304ea117c"
+  integrity sha512-TSDdSZ1E96dCze6sRp9rnib4LFRf6Lon3qfFPZbUyn7BUz3/XyT/ciWfxFEZKEeexmAkIfhBAwH62gfO2QSdlA==
   dependencies:
     "@tokenizer/token" "^0.3.0"
     content-type "^1.0.4"
     debug "^4.3.4"
-    file-type "16.5.3"
+    file-type "^16.5.4"
     media-typer "^1.1.0"
     strtok3 "^6.3.0"
     token-types "^4.2.0"
@@ -8798,14 +8775,7 @@ readable-stream@^3.0.6, readable-stream@^3.6.0:
     string_decoder "^1.1.1"
     util-deprecate "^1.0.1"
 
-readable-stream@^4.0.0:
-  version "4.1.0"
-  resolved "https://registry.yarnpkg.com/readable-stream/-/readable-stream-4.1.0.tgz#280d0a29f559d3fb684a277254e02b6f61ae0631"
-  integrity sha512-sVisi3+P2lJ2t0BPbpK629j8wRW06yKGJUcaLAGXPAUhyUxVJm7VsCTit1PFgT4JHUDMrGNR+ZjSKpzGaRF3zw==
-  dependencies:
-    abort-controller "^3.0.0"
-
-readable-web-to-node-stream@^3.0.0, readable-web-to-node-stream@^3.0.2:
+readable-web-to-node-stream@^3.0.0:
   version "3.0.2"
   resolved "https://registry.yarnpkg.com/readable-web-to-node-stream/-/readable-web-to-node-stream-3.0.2.tgz#5d52bb5df7b54861fd48d015e93a2cb87b3ee0bb"
   integrity sha512-ePeK6cc1EcKLEhJFt/AebMCLL+GgSKhuygrZ/GLaKZYEecIgIECf4UaUuaByiGtzckwR4ain9VzUh95T1exYGw==
