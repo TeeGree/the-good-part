@@ -6,6 +6,19 @@ import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import IconButton from '@mui/material/IconButton';
 import { parseNumberAsMinutesText } from '../utility/StringUtils';
 import Tooltip from '@mui/material/Tooltip';
+import Slider from '@mui/material/Slider';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+
+// TODO: integrate theme throughout the app
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: '#ffffff',
+    },
+  },
+});
+
+export type allowedVolume = 0 | 0.1 | 0.2 | 0.3 | 0.4 | 0.5 | 0.6 | 0.7 | 0.8 | 0.9 | 1.0;
 
 interface PlayingSongInfoProps {
     nameOfFile?: string,
@@ -16,6 +29,8 @@ interface PlayingSongInfoProps {
     isPaused: boolean,
     currentPlaybackTime: number | null,
     totalDuration: number | null
+    volume: allowedVolume,
+    changeVolume: (volume: allowedVolume) => void
 };
 
 export const PlayingSongInfo: React.FC<PlayingSongInfoProps> = (props: PlayingSongInfoProps) => {
@@ -124,6 +139,28 @@ export const PlayingSongInfo: React.FC<PlayingSongInfoProps> = (props: PlayingSo
         );
     }
 
+    const onSliderChange = (_: Event, value: number | number[]) => {
+        props.changeVolume(value as allowedVolume);
+    }
+
+    const getVolumeSlider = (): JSX.Element => {
+        return (
+            <span className={classes.volumeSliderContainer}>
+                <ThemeProvider theme={theme}>
+                    <Slider
+                        aria-label="Volume"
+                        value={props.volume}
+                        onChange={onSliderChange}
+                        step={0.1}
+                        min={0}
+                        max={1}
+                        color="primary"
+                    />
+                </ThemeProvider>
+            </span>
+        );
+    }
+
     const getPlayingSongInfo = (): JSX.Element => {
         if (props.playingSound && props.playingSound) {
             return (
@@ -132,6 +169,7 @@ export const PlayingSongInfo: React.FC<PlayingSongInfoProps> = (props: PlayingSo
                     <div className={classes.songInfoParts}>
                         {getSongTitleSection()}
                         {getPlayPauseIcon()}
+                        {getVolumeSlider()}
                     </div>
                 </div>
             );

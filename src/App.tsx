@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Howl } from 'howler';
 import { Buffer } from 'buffer';
 import * as process from 'process';
-import { PlayingSongInfo } from './components/PlayingSongInfo';
+import { PlayingSongInfo, allowedVolume } from './components/PlayingSongInfo';
 import classes from './App.module.scss';
 import { AppSettings } from './models/AppSettings';
 import { Routes, Route, Navigate } from "react-router-dom";
@@ -25,6 +25,7 @@ function App() {
     const [totalDuration, setTotalDuration] = useState<number | null>(null);
     const [isPaused, setIsPaused] = useState<boolean>(false);
     const [appSettings, setAppSettings] = useState<AppSettings>();
+    const [volume, setVolume] = useState<allowedVolume>(0.5);
 
     useEffect(() => {
         window.electron.getSettings().then((settings) => {
@@ -65,7 +66,11 @@ function App() {
         const filepath = `.\\${song.filename}`
         const filename = getFilenameFromPath(filepath);
 
-        const howlerSound = new Howl({ src: [filepath], preload: true });
+        const howlerSound = new Howl({
+            src: [filepath],
+            preload: true,
+            volume: volume
+        });
 
         howlerSound.once('play', () => {
             setPlayingSong(song);
@@ -105,6 +110,11 @@ function App() {
         setIsPaused(false);
     }
 
+    const changeVolume = (value: allowedVolume) => {
+        Howler.volume(value);
+        setVolume(value);
+    }
+
     const getPlayingSongInfo = (): JSX.Element => {
         if (playingSound) {
             return (
@@ -118,6 +128,8 @@ function App() {
                         isPaused={isPaused}
                         currentPlaybackTime={currentPlaybackTime}
                         totalDuration={totalDuration}
+                        volume={volume}
+                        changeVolume={changeVolume}
                     />
                 </div>
             );
