@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Howl } from 'howler';
 import { Buffer } from 'buffer';
 import * as process from 'process';
-import { PlayingSongInfo, allowedVolume } from './components/PlayingSongInfo';
+import { PlayingSongInfo } from './components/PlayingSongInfo';
 import classes from './App.module.scss';
 import { AppSettings } from './models/AppSettings';
 import { Routes, Route, Navigate } from "react-router-dom";
@@ -16,6 +16,10 @@ import { SongInfo } from './models/SongInfo';
 window.Buffer = Buffer;
 window.process = process;
 
+const defaultVolume = 0.5;
+
+Howler.volume(defaultVolume);
+
 function App() {
     const [playingSound, setPlayingSound] = useState<Howl>();
     const [playingSong, setPlayingSong] = useState<SongInfo>();
@@ -25,13 +29,17 @@ function App() {
     const [totalDuration, setTotalDuration] = useState<number | null>(null);
     const [isPaused, setIsPaused] = useState<boolean>(false);
     const [appSettings, setAppSettings] = useState<AppSettings>();
-    const [volume, setVolume] = useState<allowedVolume>(0.5);
+    const [volume, setVolume] = useState<number>(defaultVolume);
 
     useEffect(() => {
         window.electron.getSettings().then((settings) => {
             setAppSettings(settings);
         });
     }, []);
+
+    useEffect(() => {
+        Howler.volume(volume);
+    }, [volume]);
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -69,7 +77,6 @@ function App() {
         const howlerSound = new Howl({
             src: [filepath],
             preload: true,
-            volume: volume
         });
 
         howlerSound.once('play', () => {
@@ -91,6 +98,7 @@ function App() {
         howlerSound.once('end', () => {
             setPlayingSound(undefined);
             setPlayingSong(undefined);
+            setPlayingSongId(undefined);
         })
         
         if (playingSound) {
@@ -110,8 +118,7 @@ function App() {
         setIsPaused(false);
     }
 
-    const changeVolume = (value: allowedVolume) => {
-        Howler.volume(value);
+    const changeVolume = (value: number) => {
         setVolume(value);
     }
 

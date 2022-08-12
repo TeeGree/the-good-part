@@ -18,8 +18,6 @@ const theme = createTheme({
   },
 });
 
-export type allowedVolume = 0 | 0.1 | 0.2 | 0.3 | 0.4 | 0.5 | 0.6 | 0.7 | 0.8 | 0.9 | 1.0;
-
 interface PlayingSongInfoProps {
     nameOfFile?: string,
     fileMetadata?: IAudioMetadata
@@ -29,8 +27,8 @@ interface PlayingSongInfoProps {
     isPaused: boolean,
     currentPlaybackTime: number | null,
     totalDuration: number | null
-    volume: allowedVolume,
-    changeVolume: (volume: allowedVolume) => void
+    volume: number,
+    changeVolume: (volume: number) => void
 };
 
 export const PlayingSongInfo: React.FC<PlayingSongInfoProps> = (props: PlayingSongInfoProps) => {
@@ -140,7 +138,7 @@ export const PlayingSongInfo: React.FC<PlayingSongInfoProps> = (props: PlayingSo
     }
 
     const onSliderChange = (_: Event, value: number | number[]) => {
-        props.changeVolume(value as allowedVolume);
+        props.changeVolume(value as number);
     }
 
     const getVolumeSlider = (): JSX.Element => {
@@ -151,7 +149,7 @@ export const PlayingSongInfo: React.FC<PlayingSongInfoProps> = (props: PlayingSo
                         aria-label="Volume"
                         value={props.volume}
                         onChange={onSliderChange}
-                        step={0.1}
+                        step={0.01}
                         min={0}
                         max={1}
                         color="primary"
