@@ -1,0 +1,30 @@
+$sliderWidth: 100px;
+$iconWidth: 40px;
+
+.volumeContainer {
+    $volumeSliderContainerWidth: $sliderWidth + ($iconWidth * 2);
+    width: $volumeSliderContainerWidth;
+    max-width: $volumeSliderContainerWidth;
+    min-width: $volumeSliderContainerWidth;
+    position: sticky;
+    left: calc(100% - $volumeSliderContainerWidth);
+    display: flex;
+    align-items: center;
+    margin-bottom: 1em;
+}
+
+.volumePartsContainer {
+    height: 50px;
+    display: flex;
+    align-items: center;
+}
+
+.volumeSliderContainer {
+    width: $sliderWidth;
+    max-width: $sliderWidth;
+    min-width: $sliderWidth;
+}
+
+.volumeIcon {
+    width: $iconWidth;
+}

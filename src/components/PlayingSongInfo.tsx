@@ -5,19 +5,8 @@ import PauseIcon from '@mui/icons-material/Pause';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import IconButton from '@mui/material/IconButton';
 import { parseNumberAsMinutesText } from '../utility/StringUtils';
-import Slider from '@mui/material/Slider';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { SongTitleContainer } from './SongTitleContainer';
-import Tooltip from '@mui/material/Tooltip';
-
-// TODO: integrate theme throughout the app
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: '#ffffff',
-    },
-  },
-});
+import { VolumeContainer } from './VolumeContainer';
 
 interface PlayingSongInfoProps {
     nameOfFile?: string,
@@ -82,35 +71,6 @@ export const PlayingSongInfo: React.FC<PlayingSongInfoProps> = (props: PlayingSo
         );
     }
 
-    const onSliderChange = (_: Event, value: number | number[]) => {
-        props.changeVolume(value as number);
-    }
-
-    const getFormattedVolume = (): string => {
-        const volumePct = Math.floor(props.volume * 100);
-        return `${volumePct}%`
-    }
-
-    const getVolumeSlider = (): JSX.Element => {
-        return (
-            <span className={classes.volumeSliderContainer}>
-                <ThemeProvider theme={theme}>
-                    <Tooltip placement="top" title={getFormattedVolume()}>
-                        <Slider
-                            aria-label="Volume"
-                            value={props.volume}
-                            onChange={onSliderChange}
-                            step={0.01}
-                            min={0}
-                            max={1}
-                            color="primary"
-                        />
-                    </Tooltip>
-                </ThemeProvider>
-            </span>
-        );
-    }
-
     const getPlayingSongInfo = (): JSX.Element => {
         if (props.playingSound && props.playingSound) {
             return (
@@ -122,7 +82,10 @@ export const PlayingSongInfo: React.FC<PlayingSongInfoProps> = (props: PlayingSo
                             fileMetadata={props.fileMetadata}
                         />
                         {getPlayPauseIcon()}
-                        {getVolumeSlider()}
+                        <VolumeContainer
+                            volume={props.volume}
+                            changeVolume={props.changeVolume}
+                        />
                     </div>
                 </div>
             );
