@@ -5,9 +5,9 @@ import PauseIcon from '@mui/icons-material/Pause';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import IconButton from '@mui/material/IconButton';
 import { parseNumberAsMinutesText } from '../utility/StringUtils';
-import Tooltip from '@mui/material/Tooltip';
 import Slider from '@mui/material/Slider';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { SongTitleContainer } from './SongTitleContainer';
 
 // TODO: integrate theme throughout the app
 const theme = createTheme({
@@ -20,7 +20,7 @@ const theme = createTheme({
 
 interface PlayingSongInfoProps {
     nameOfFile?: string,
-    fileMetadata?: IAudioMetadata
+    fileMetadata?: IAudioMetadata,
     playingSound?: Howl,
     onPause: () => void,
     onPlay: () => void,
@@ -32,62 +32,6 @@ interface PlayingSongInfoProps {
 };
 
 export const PlayingSongInfo: React.FC<PlayingSongInfoProps> = (props: PlayingSongInfoProps) => {
-
-    const getSongTitleSection = (): JSX.Element => {
-        return (
-            <Tooltip placement="top" title={getSongHoverText()}>
-                <div className={classes.songTitleContainer}>
-                    {getSongTitle()}
-                    {getArtist()}
-                </div>
-            </Tooltip>
-        );
-    }
-
-    const getSongTitle = (): JSX.Element => {
-        return (
-            <div className={classes.songTitle}>
-                {getSongTitleText()}
-            </div>
-        );
-    }
-
-    const getSongTitleText = () => {
-        const fallbackFilename = props.nameOfFile;
-        const title = props.fileMetadata?.common?.title;
-
-        if (title) {
-            return title;
-        } else if (fallbackFilename) {
-            return fallbackFilename;
-        }
-
-        return 'Unknown';
-    }
-
-    const getArtist = () => {
-        return (
-            <div className={classes.artistName}>
-                {getArtistText()}
-            </div>
-        )
-    }
-
-    const getArtistText = () => {
-        return props.fileMetadata?.common?.artist ?? '';
-    }
-
-    const getSongHoverText = () => {
-        let songInfoText = getSongTitleText();
-        const artist = getArtistText();
-
-        if (artist) {
-            songInfoText += ` by ${artist}`;
-        }
-
-        return songInfoText;
-    }
-
     const togglePlay = () => {
         if (props.isPaused) {
             props.onPlay();
@@ -165,7 +109,10 @@ export const PlayingSongInfo: React.FC<PlayingSongInfoProps> = (props: PlayingSo
                 <div className={classes.songInfoContainer}>
                     {getProgressBar()}
                     <div className={classes.songInfoParts}>
-                        {getSongTitleSection()}
+                        <SongTitleContainer
+                            nameOfFile={props.nameOfFile}
+                            fileMetadata={props.fileMetadata}
+                        />
                         {getPlayPauseIcon()}
                         {getVolumeSlider()}
                     </div>

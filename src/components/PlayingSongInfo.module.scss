@@ -18,26 +18,6 @@ $playingSongInfoHeight: 102px;
     border-radius: inherit;
 }
 
-.songTitleContainer {
-    width: 30%;
-    text-align: left;
-    margin-left: 1em;
-    margin-bottom: 1em;
-    display: inline-block;
-}
-
-.songTitle {
-    text-overflow: ellipsis;
-    overflow: hidden;
-    white-space: nowrap;
-    font-size: 18px;
-}
-
-.artistName {
-    font-size: 14px;
-    color: lightgray;
-}
-
 .songInfoParts {
     display: flex;
 }
