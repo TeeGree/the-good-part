@@ -158,6 +158,8 @@ function App() {
                         changeVolume={changeVolume}
                         playNextSong={playNextSong}
                         playPreviousSong={playPreviousSong}
+                        canPlayNextSong={canPlayNextSong()}
+                        canPlayPreviousSong={canPlayPreviousSong()}
                     />
                 </div>
             );
@@ -176,6 +178,22 @@ function App() {
                 setHowlerEndCallback(playingSound, index);
             }
         }
+    }
+
+    const canPlayNextSong = () => {
+        if (playingSongIndex === undefined || appSettings?.songs === undefined) {
+            return false;
+        }
+
+        return playingSongIndex < (appSettings.songs.length - 1);
+    }
+
+    const canPlayPreviousSong = () => {
+        if (playingSongIndex === undefined || appSettings?.songs === undefined) {
+            return false;
+        }
+
+        return playingSongIndex > 0;
     }
 
     const playNextSong = () => {

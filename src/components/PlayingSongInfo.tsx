@@ -21,7 +21,9 @@ interface PlayingSongInfoProps {
     volume: number,
     changeVolume: (volume: number) => void,
     playNextSong: () => void,
-    playPreviousSong: () => void
+    playPreviousSong: () => void,
+    canPlayNextSong: boolean,
+    canPlayPreviousSong: boolean
 };
 
 export const PlayingSongInfo: React.FC<PlayingSongInfoProps> = (props: PlayingSongInfoProps) => {
@@ -33,27 +35,50 @@ export const PlayingSongInfo: React.FC<PlayingSongInfoProps> = (props: PlayingSo
         }
     }
 
-    const getPlayPauseIcon = (): JSX.Element => {
+    const getPreviousButton = (): JSX.Element => {
+        if (!props.canPlayPreviousSong) {
+            return (<></>);
+        }
+
         return (
-            <span className={classes.playIconContainer}>
+            <IconButton
+                className={classes.previousButton}
+                color="inherit"
+                onClick={props.playPreviousSong}
+            >
+                <SkipPrevious />
+            </IconButton>
+        );
+    }
+
+    const getNextButton = (): JSX.Element => {
+        if (!props.canPlayNextSong) {
+            return (<></>);
+        }
+
+        return (
+            <IconButton
+                className={classes.nextButton}
+                color="inherit"
+                onClick={props.playNextSong}
+            >
+                <SkipNext />
+            </IconButton>
+        );
+    }
+
+    const getPlaybackButtons = (): JSX.Element => {
+        return (
+            <span className={classes.playbackButtonsContainer}>
+                {getPreviousButton()}
                 <IconButton
-                    color="inherit"
-                    onClick={props.playPreviousSong}
-                >
-                    <SkipPrevious />
-                </IconButton>
-                <IconButton
+                    className={classes.playButton}
                     color="inherit"
                     onClick={togglePlay}
                 >
                     {props.isPaused ? (<PlayArrowIcon />) : (<PauseIcon />)}
                 </IconButton>
-                <IconButton
-                    color="inherit"
-                    onClick={props.playNextSong}
-                >
-                    <SkipNext />
-                </IconButton>
+                {getNextButton()}
             </span>
         );
     }
@@ -96,7 +121,7 @@ export const PlayingSongInfo: React.FC<PlayingSongInfoProps> = (props: PlayingSo
                             nameOfFile={props.nameOfFile}
                             fileMetadata={props.fileMetadata}
                         />
-                        {getPlayPauseIcon()}
+                        {getPlaybackButtons()}
                         <VolumeContainer
                             volume={props.volume}
                             changeVolume={props.changeVolume}

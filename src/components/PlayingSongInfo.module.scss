@@ -22,10 +22,27 @@ $playingSongInfoHeight: 102px;
     display: flex;
 }
 
-.playIconContainer {
+.playbackButtonsContainer {
+    $playbackButtonsWidth: 120px;
+    $buttonWidth: 40px;
     position: sticky;
     left: calc(50vw - 60px);
-    width: 120px;
-    min-width: 120px;
+    width: $playbackButtonsWidth;
+    min-width: $playbackButtonsWidth;
     bottom: 25%;
+    .previousButton {
+        position: sticky;
+        left: 0;
+        right: calc(100% - $buttonWidth);
+    }
+    .playButton {
+        position: sticky;
+        left: calc(50% - ($buttonWidth / 2));
+        right: calc(50% - ($buttonWidth / 2));
+    }
+    .nextButton {
+        position: sticky;
+        left: calc(100% - $buttonWidth);
+        right: 0;
+    }
 }
