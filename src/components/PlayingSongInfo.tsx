@@ -7,6 +7,7 @@ import IconButton from '@mui/material/IconButton';
 import { parseNumberAsMinutesText } from '../utility/StringUtils';
 import { SongTitleContainer } from './SongTitleContainer';
 import { VolumeContainer } from './VolumeContainer';
+import { SkipNext, SkipPrevious } from '@mui/icons-material';
 
 interface PlayingSongInfoProps {
     nameOfFile?: string,
@@ -18,7 +19,9 @@ interface PlayingSongInfoProps {
     currentPlaybackTime: number | null,
     totalDuration: number | null
     volume: number,
-    changeVolume: (volume: number) => void
+    changeVolume: (volume: number) => void,
+    playNextSong: () => void,
+    playPreviousSong: () => void
 };
 
 export const PlayingSongInfo: React.FC<PlayingSongInfoProps> = (props: PlayingSongInfoProps) => {
@@ -35,9 +38,21 @@ export const PlayingSongInfo: React.FC<PlayingSongInfoProps> = (props: PlayingSo
             <span className={classes.playIconContainer}>
                 <IconButton
                     color="inherit"
+                    onClick={props.playPreviousSong}
+                >
+                    <SkipPrevious />
+                </IconButton>
+                <IconButton
+                    color="inherit"
                     onClick={togglePlay}
                 >
                     {props.isPaused ? (<PlayArrowIcon />) : (<PauseIcon />)}
+                </IconButton>
+                <IconButton
+                    color="inherit"
+                    onClick={props.playNextSong}
+                >
+                    <SkipNext />
                 </IconButton>
             </span>
         );

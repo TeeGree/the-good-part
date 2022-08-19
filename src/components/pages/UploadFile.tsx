@@ -1,4 +1,4 @@
-import React from 'react';
+import { ChangeEvent } from 'react';
 import classes from './UploadFile.module.scss';
 import Button from '@mui/material/Button';
 
@@ -8,7 +8,7 @@ interface SelectFileProps {
 }
 
 export const UploadFile: React.FC<SelectFileProps> = (props: SelectFileProps) => {
-    const openFile = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const openFile = async (event: ChangeEvent<HTMLInputElement>) => {
         if (event.target.files !== null && event.target.files.length > 0) {
             const file: File = event.target.files[0];
             await props.onLoadFile(file);

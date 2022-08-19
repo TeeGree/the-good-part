@@ -15,7 +15,7 @@ import IconButton from '@mui/material/IconButton';
 
 interface LibraryProps {
     appSettings: AppSettings | undefined,
-    playSong: (songId: string) => void,
+    playSong: (index: number) => void,
     playingSongId: string | undefined,
     isPaused: boolean,
     onPause: () => void,
@@ -24,13 +24,13 @@ interface LibraryProps {
 
 export const Library: React.FC<LibraryProps> = (props: LibraryProps) => {
 
-    const getPlaybackIcon = (song: SongInfo) => {
+    const getPlaybackIcon = (song: SongInfo, index: number) => {
         // This row's song is not playing.
         if (props.playingSongId !== song.id) {
             return (
                 <IconButton
                     color="inherit"
-                    onClick={() => props.playSong(song.id)}
+                    onClick={() => props.playSong(index)}
                 >
                     <PlayArrowIcon />
                 </IconButton>
@@ -71,9 +71,9 @@ export const Library: React.FC<LibraryProps> = (props: LibraryProps) => {
         return (
             <TableRow key={index}>
                 <TableCell className={classes.tableCell}>
-                    {getPlaybackIcon(song)}
+                    {getPlaybackIcon(song, index)}
                 </TableCell>
-                <TableCell className={classes.tableCell}>{commonMetadata.title}</TableCell>
+                <TableCell className={classes.tableCell}>{commonMetadata.title ?? song.filename}</TableCell>
                 <TableCell className={classes.tableCell}>{commonMetadata.artist}</TableCell>
                 <TableCell className={classes.tableCell}>{commonMetadata.album}</TableCell>
                 <TableCell className={classes.tableCell}>{durationText}</TableCell>

@@ -25,6 +25,7 @@ function App() {
     const [playingSong, setPlayingSong] = useState<SongInfo>();
     const [nameOfFile, setNameOfFile] = useState<string>();
     const [playingSongId, setPlayingSongId] = useState<string>();
+    const [playingSongIndex, setPlayingSongIndex] = useState<number>();
     const [currentPlaybackTime, setCurrentPlaybackTime] = useState<number | null>(null);
     const [totalDuration, setTotalDuration] = useState<number | null>(null);
     const [isPaused, setIsPaused] = useState<boolean>(false);
@@ -53,7 +54,7 @@ function App() {
                     setTotalDuration(duration);
                 }
             }
-        }, 1000);
+        }, 100);
         return () => clearInterval(interval);
     }, [playingSound]);
 
@@ -65,8 +66,15 @@ function App() {
         setPlayingSong(undefined);
     }
     
-    const playSong = (songId: string) => {
+    const playSong = (index: number) => {
+        const songId = appSettings?.songs[index].id;
+
+        if (songId === undefined) {
+            throw Error('Song index is invalid!');
+        }
+
         const song = appSettings?.songMap.get(songId);
+        
         if (song === undefined) {
             throw Error('Song ID is invalid!');
         }
@@ -86,20 +94,14 @@ function App() {
             setTotalDuration(howlerSound.duration());
             if (songId) {
                 setPlayingSongId(songId);
-            } else {
-                setPlayingSongId(undefined);
+                setPlayingSongIndex(index);
+                setHowlerEndCallback(howlerSound, index);
             }
             
             if (isPaused) {
                 setIsPaused(false);
             }
         });
-
-        howlerSound.once('end', () => {
-            setPlayingSound(undefined);
-            setPlayingSong(undefined);
-            setPlayingSongId(undefined);
-        })
         
         if (playingSound) {
             playingSound.stop();
@@ -107,6 +109,23 @@ function App() {
 
         howlerSound.play();
     }
+
+    const setHowlerEndCallback = (sound: Howl, index: number) => {
+        if (!sound) {
+            return;
+        }
+        sound.off('end');
+        sound.once('end', () => {
+            if (index !== undefined && appSettings?.songs && appSettings.songs.length > index + 1) {
+                playSong(index + 1);
+            } else {
+                setPlayingSound(undefined);
+                setPlayingSong(undefined);
+                setPlayingSongId(undefined);
+            }
+        })
+    }
+
 
     const pausePlayingSong = () => {
         playingSound?.pause();
@@ -137,6 +156,8 @@ function App() {
                         totalDuration={totalDuration}
                         volume={volume}
                         changeVolume={changeVolume}
+                        playNextSong={playNextSong}
+                        playPreviousSong={playPreviousSong}
                     />
                 </div>
             );
@@ -149,6 +170,24 @@ function App() {
         await window.electron.uploadFile(file.path);
         const settings = await window.electron.getSettings();
         setAppSettings(settings);
+        if (playingSongId) {
+            const index = settings.songs.findIndex((song) => song.id === playingSongId);
+            if (index >= 0 && playingSound) {
+                setHowlerEndCallback(playingSound, index);
+            }
+        }
+    }
+
+    const playNextSong = () => {
+        if (playingSongIndex !== undefined) {
+            playSong(playingSongIndex + 1);
+        }
+    }
+
+    const playPreviousSong = () => {
+        if (playingSongIndex !== undefined) {
+            playSong(playingSongIndex - 1);
+        }
     }
 
     return (
