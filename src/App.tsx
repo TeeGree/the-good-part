@@ -1,11 +1,11 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Howl } from 'howler';
 import { Buffer } from 'buffer';
 import * as process from 'process';
 import { PlayingSongInfo } from './components/PlayingSongInfo';
 import classes from './App.module.scss';
 import { AppSettings } from './models/AppSettings';
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { Library } from './components/pages/Library';
 import { UploadFile } from './components/pages/UploadFile';
 import { NavPanel } from './components/NavPanel';
@@ -20,7 +20,7 @@ const defaultVolume = 0.5;
 
 Howler.volume(defaultVolume);
 
-function App() {
+const App: React.FC = () => {
     const [playingSound, setPlayingSound] = useState<Howl>();
     const [playingSong, setPlayingSong] = useState<SongInfo>();
     const [nameOfFile, setNameOfFile] = useState<string>();
@@ -33,7 +33,7 @@ function App() {
     const [volume, setVolume] = useState<number>(defaultVolume);
 
     useEffect(() => {
-        window.electron.getSettings().then((settings) => {
+        void window.electron.getSettings().then((settings) => {
             setAppSettings(settings);
         });
     }, []);
@@ -44,7 +44,7 @@ function App() {
 
     useEffect(() => {
         const interval = setInterval(() => {
-            if (playingSound && playingSound && playingSound.playing()) {
+            if ((playingSound?.playing()) === true) {
                 const duration = playingSound.duration();
                 const playbackPosition = playingSound.seek();
                 if (duration === playbackPosition) {
@@ -58,15 +58,15 @@ function App() {
         return () => clearInterval(interval);
     }, [playingSound]);
 
-    const clearPlayingSong = () => {
+    const clearPlayingSong = (): void => {
         setPlayingSound(undefined);
         setCurrentPlaybackTime(null);
         setTotalDuration(null);
         setPlayingSongId(undefined);
         setPlayingSong(undefined);
-    }
-    
-    const playSong = (index: number) => {
+    };
+
+    const playSong = (index: number): void => {
         const songId = appSettings?.songs[index].id;
 
         if (songId === undefined) {
@@ -74,17 +74,17 @@ function App() {
         }
 
         const song = appSettings?.songMap.get(songId);
-        
+
         if (song === undefined) {
             throw Error('Song ID is invalid!');
         }
 
-        const filepath = `.\\${song.filename}`
+        const filepath = `.\\${song.filename}`;
         const filename = getFilenameFromPath(filepath);
 
         const howlerSound = new Howl({
             src: [filepath],
-            preload: true,
+            preload: true
         });
 
         howlerSound.once('play', () => {
@@ -92,57 +92,60 @@ function App() {
             setPlayingSound(howlerSound);
             setNameOfFile(filename);
             setTotalDuration(howlerSound.duration());
-            if (songId) {
+            if (songId !== undefined) {
                 setPlayingSongId(songId);
                 setPlayingSongIndex(index);
                 setHowlerEndCallback(howlerSound, index);
             }
-            
+
             if (isPaused) {
                 setIsPaused(false);
             }
         });
-        
-        if (playingSound) {
+
+        if (playingSound != null) {
             playingSound.stop();
         }
 
         howlerSound.play();
-    }
+    };
 
-    const setHowlerEndCallback = (sound: Howl, index: number) => {
-        if (!sound) {
+    const setHowlerEndCallback = (sound: Howl | undefined, index: number): void => {
+        if (sound === undefined) {
             return;
         }
         sound.off('end');
         sound.once('end', () => {
-            if (index !== undefined && appSettings?.songs && appSettings.songs.length > index + 1) {
+            if (
+                index !== undefined &&
+                appSettings?.songs != null &&
+                appSettings.songs.length > index + 1
+            ) {
                 playSong(index + 1);
             } else {
                 setPlayingSound(undefined);
                 setPlayingSong(undefined);
                 setPlayingSongId(undefined);
             }
-        })
-    }
+        });
+    };
 
-
-    const pausePlayingSong = () => {
+    const pausePlayingSong = (): void => {
         playingSound?.pause();
         setIsPaused(true);
-    }
+    };
 
-    const resumePlayingSong = () => {
+    const resumePlayingSong = (): void => {
         playingSound?.play();
         setIsPaused(false);
-    }
+    };
 
-    const changeVolume = (value: number) => {
+    const changeVolume = (value: number): void => {
         setVolume(value);
-    }
+    };
 
     const getPlayingSongInfo = (): JSX.Element => {
-        if (playingSound) {
+        if (playingSound != null) {
             return (
                 <div className={classes.playingSongInfo}>
                     <PlayingSongInfo
@@ -164,49 +167,49 @@ function App() {
                 </div>
             );
         }
-        
-        return (<></>);
-    }
 
-    const uploadFile = async (file: File) => {
+        return <></>;
+    };
+
+    const uploadFile = async (file: File): Promise<void> => {
         await window.electron.uploadFile(file.path);
         const settings = await window.electron.getSettings();
         setAppSettings(settings);
-        if (playingSongId) {
+        if (playingSongId !== undefined) {
             const index = settings.songs.findIndex((song) => song.id === playingSongId);
-            if (index >= 0 && playingSound) {
+            if (index >= 0 && playingSound != null) {
                 setHowlerEndCallback(playingSound, index);
             }
         }
-    }
+    };
 
-    const canPlayNextSong = () => {
+    const canPlayNextSong = (): boolean => {
         if (playingSongIndex === undefined || appSettings?.songs === undefined) {
             return false;
         }
 
-        return playingSongIndex < (appSettings.songs.length - 1);
-    }
+        return playingSongIndex < appSettings.songs.length - 1;
+    };
 
-    const canPlayPreviousSong = () => {
+    const canPlayPreviousSong = (): boolean => {
         if (playingSongIndex === undefined || appSettings?.songs === undefined) {
             return false;
         }
 
         return playingSongIndex > 0;
-    }
+    };
 
-    const playNextSong = () => {
+    const playNextSong = (): void => {
         if (playingSongIndex !== undefined) {
             playSong(playingSongIndex + 1);
         }
-    }
+    };
 
-    const playPreviousSong = () => {
+    const playPreviousSong = (): void => {
         if (playingSongIndex !== undefined) {
             playSong(playingSongIndex - 1);
         }
-    }
+    };
 
     return (
         <div className={classes.app}>

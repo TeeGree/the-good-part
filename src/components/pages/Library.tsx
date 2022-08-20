@@ -14,24 +14,20 @@ import PauseIcon from '@mui/icons-material/Pause';
 import IconButton from '@mui/material/IconButton';
 
 interface LibraryProps {
-    appSettings: AppSettings | undefined,
-    playSong: (index: number) => void,
-    playingSongId: string | undefined,
-    isPaused: boolean,
-    onPause: () => void,
-    onResume: () => void
+    appSettings: AppSettings | undefined;
+    playSong: (index: number) => void;
+    playingSongId: string | undefined;
+    isPaused: boolean;
+    onPause: () => void;
+    onResume: () => void;
 }
 
 export const Library: React.FC<LibraryProps> = (props: LibraryProps) => {
-
-    const getPlaybackIcon = (song: SongInfo, index: number) => {
+    const getPlaybackIcon = (song: SongInfo, index: number): JSX.Element => {
         // This row's song is not playing.
         if (props.playingSongId !== song.id) {
             return (
-                <IconButton
-                    color="inherit"
-                    onClick={() => props.playSong(index)}
-                >
+                <IconButton color="inherit" onClick={() => props.playSong(index)}>
                     <PlayArrowIcon />
                 </IconButton>
             );
@@ -40,56 +36,46 @@ export const Library: React.FC<LibraryProps> = (props: LibraryProps) => {
         // This row's song is playing, but paused.
         if (props.isPaused) {
             return (
-                <IconButton
-                    color="inherit"
-                    onClick={props.onResume}
-                >
+                <IconButton color="inherit" onClick={props.onResume}>
                     <PlayArrowIcon />
                 </IconButton>
             );
         }
-        
+
         // This row's song is playing and not paused.
         return (
-            <IconButton
-                color="inherit"
-                onClick={props.onPause}
-            >
+            <IconButton color="inherit" onClick={props.onPause}>
                 <PauseIcon />
             </IconButton>
         );
-    }
+    };
 
-    const getRowForSong = (index: number, song: SongInfo) => {
+    const getRowForSong = (index: number, song: SongInfo): JSX.Element => {
         if (song.metadata === undefined) {
-            return (<></>);
+            return <></>;
         }
-        
+
         const metadata = song.metadata;
         const commonMetadata = metadata.common;
-        const durationText = parseNumberAsMinutesText(metadata.format.duration ?? 0)
+        const durationText = parseNumberAsMinutesText(metadata.format.duration ?? 0);
         return (
             <TableRow key={index}>
+                <TableCell className={classes.tableCell}>{getPlaybackIcon(song, index)}</TableCell>
                 <TableCell className={classes.tableCell}>
-                    {getPlaybackIcon(song, index)}
+                    {commonMetadata.title ?? song.filename}
                 </TableCell>
-                <TableCell className={classes.tableCell}>{commonMetadata.title ?? song.filename}</TableCell>
                 <TableCell className={classes.tableCell}>{commonMetadata.artist}</TableCell>
                 <TableCell className={classes.tableCell}>{commonMetadata.album}</TableCell>
                 <TableCell className={classes.tableCell}>{durationText}</TableCell>
             </TableRow>
         );
-    }
-    
-    const getRowsForSongsInSettings = () => {
+    };
+
+    const getRowsForSongsInSettings = (): JSX.Element => {
         const songRows = props.appSettings?.songs.map((song, i) => getRowForSong(i, song));
 
-        return (
-            <TableBody>
-                {songRows}
-            </TableBody>
-        );
-    }
+        return <TableBody>{songRows}</TableBody>;
+    };
 
     return (
         <TableContainer>
@@ -107,4 +93,4 @@ export const Library: React.FC<LibraryProps> = (props: LibraryProps) => {
             </Table>
         </TableContainer>
     );
-}
+};

@@ -8,33 +8,30 @@ import { SongInfo } from '../models/SongInfo';
 
 const configFile = './the-good-part.settings.json';
 
-export const setupIpcHandlers = () => {
+export const setupIpcHandlers = (): void => {
     ipcMain.handle('get-settings', async (_) => {
-        return await getParsedSettings()
-            .catch(() => {
-                return 'Error reading settings file';
-            });
+        return await getParsedSettings().catch(() => {
+            return 'Error reading settings file';
+        });
     });
 
     ipcMain.handle('get-file-metadata', async (_, filepath: string) => {
-        return await getFileMetadata(filepath)
-            .catch(() => {
-                return 'Error getting file metadata';
-            });
+        return await getFileMetadata(filepath).catch(() => {
+            return 'Error getting file metadata';
+        });
     });
 
     ipcMain.handle('upload-file', async (_, filepath: string) => {
-        return await copyFileToPublicFolder(filepath)
-            .catch(() => {
-                return 'Error uploading file';
-            });
+        return await copyFileToPublicFolder(filepath).catch(() => {
+            return 'Error uploading file';
+        });
     });
-}
+};
 
 const getParsedSettings = async (): Promise<AppSettings> => {
     const settings = await getSettingsFromFile();
     return await parseAppSettings(settings);
-}
+};
 
 const getSettingsFromFile = async (): Promise<AppSettingsFromFile> => {
     try {
@@ -48,24 +45,24 @@ const getSettingsFromFile = async (): Promise<AppSettingsFromFile> => {
         await writeSettingsToFile(defaultSettings);
         return defaultSettings;
     }
-}
+};
 
 const writeSettingsToFile = async (settings: AppSettingsFromFile): Promise<void> => {
-    return await fs.promises.writeFile(configFile, JSON.stringify(settings))
-}
+    return await fs.promises.writeFile(configFile, JSON.stringify(settings));
+};
 
 interface SongMetadataMapping {
-    id: string,
-    metadata: IAudioMetadata
+    id: string;
+    metadata: IAudioMetadata;
 }
 
-const parseAppSettings = async (appSettings: AppSettingsFromFile) => {
+const parseAppSettings = async (appSettings: AppSettingsFromFile): Promise<AppSettings> => {
     const metadataMappings = await Promise.all(
         appSettings.songs.map(async (song) => {
             const metadata = await getFileMetadata(song.filename);
             const metadataMapping: SongMetadataMapping = {
                 id: song.id,
-                metadata: metadata
+                metadata
             };
             return metadataMapping;
         })
@@ -74,8 +71,9 @@ const parseAppSettings = async (appSettings: AppSettingsFromFile) => {
     const metadataDict = new Map<string, IAudioMetadata>();
 
     metadataMappings.forEach((metadataMapping) =>
-        metadataDict.set(metadataMapping.id, metadataMapping.metadata));
-    
+        metadataDict.set(metadataMapping.id, metadataMapping.metadata)
+    );
+
     const songs: SongInfo[] = [];
     const songMap = new Map<string, SongInfo>();
     appSettings.songs.forEach((song: SongInfoFromSettings) => {
@@ -92,35 +90,35 @@ const parseAppSettings = async (appSettings: AppSettingsFromFile) => {
     });
 
     const parsedSettings: AppSettings = {
-        songs: songs,
-        songMap: songMap
+        songs,
+        songMap
     };
 
     return parsedSettings;
-}
+};
 
 const getFileMetadata = async (filename: string): Promise<IAudioMetadata> => {
     const fullpath = getFullPathWithPublicElectronFolder(filename);
     return await parseFile(fullpath);
-}
+};
 
-const getFullPathWithPublicElectronFolder = (filename: string) => {
+const getFullPathWithPublicElectronFolder = (filename: string): string => {
     const electronPath = app.getAppPath();
     return `${electronPath}\\public\\${filename}`;
-}
+};
 
-const copyFileToPublicFolder = async (filepath: string) => {
+const copyFileToPublicFolder = async (filepath: string): Promise<void> => {
     const filename = getFilenameFromPath(filepath);
     const targetPath = getFullPathWithPublicElectronFolder(filename);
     await fs.promises.copyFile(filepath, targetPath);
     await addToAppSettingsFile(filename);
-}
+};
 
-const addToAppSettingsFile = async (filename: string) => {
+const addToAppSettingsFile = async (filename: string): Promise<void> => {
     const settings = await getSettingsFromFile();
     settings.songs.push({
         id: uuidv4(),
-        filename: filename
+        filename
     });
     await writeSettingsToFile(settings);
-}
+};

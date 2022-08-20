@@ -1,43 +1,44 @@
-import { Howl } from 'howler';
-import { IAudioMetadata } from 'music-metadata';
-import classes from './PlayingSongInfo.module.scss';
-import PauseIcon from '@mui/icons-material/Pause';
-import PlayArrowIcon from '@mui/icons-material/PlayArrow';
-import IconButton from '@mui/material/IconButton';
-import { parseNumberAsMinutesText } from '../utility/StringUtils';
-import { SongTitleContainer } from './SongTitleContainer';
-import { VolumeContainer } from './VolumeContainer';
-import { SkipNext, SkipPrevious } from '@mui/icons-material';
+import React from 'react'
+import { Howl } from 'howler'
+import { IAudioMetadata } from 'music-metadata'
+import classes from './PlayingSongInfo.module.scss'
+import PauseIcon from '@mui/icons-material/Pause'
+import PlayArrowIcon from '@mui/icons-material/PlayArrow'
+import IconButton from '@mui/material/IconButton'
+import { parseNumberAsMinutesText } from '../utility/StringUtils'
+import { SongTitleContainer } from './SongTitleContainer'
+import { VolumeContainer } from './VolumeContainer'
+import { SkipNext, SkipPrevious } from '@mui/icons-material'
 
 interface PlayingSongInfoProps {
-    nameOfFile?: string,
-    fileMetadata?: IAudioMetadata,
-    playingSound?: Howl,
-    onPause: () => void,
-    onPlay: () => void,
-    isPaused: boolean,
-    currentPlaybackTime: number | null,
+    nameOfFile?: string
+    fileMetadata?: IAudioMetadata
+    playingSound?: Howl
+    onPause: () => void
+    onPlay: () => void
+    isPaused: boolean
+    currentPlaybackTime: number | null
     totalDuration: number | null
-    volume: number,
-    changeVolume: (volume: number) => void,
-    playNextSong: () => void,
-    playPreviousSong: () => void,
-    canPlayNextSong: boolean,
+    volume: number
+    changeVolume: (volume: number) => void
+    playNextSong: () => void
+    playPreviousSong: () => void
+    canPlayNextSong: boolean
     canPlayPreviousSong: boolean
 };
 
 export const PlayingSongInfo: React.FC<PlayingSongInfoProps> = (props: PlayingSongInfoProps) => {
-    const togglePlay = () => {
+    const togglePlay = (): void => {
         if (props.isPaused) {
-            props.onPlay();
+            props.onPlay()
         } else {
-            props.onPause();
+            props.onPause()
         }
     }
 
     const getPreviousButton = (): JSX.Element => {
         if (!props.canPlayPreviousSong) {
-            return (<></>);
+            return (<></>)
         }
 
         return (
@@ -48,12 +49,12 @@ export const PlayingSongInfo: React.FC<PlayingSongInfoProps> = (props: PlayingSo
             >
                 <SkipPrevious />
             </IconButton>
-        );
+        )
     }
 
     const getNextButton = (): JSX.Element => {
         if (!props.canPlayNextSong) {
-            return (<></>);
+            return (<></>)
         }
 
         return (
@@ -64,7 +65,7 @@ export const PlayingSongInfo: React.FC<PlayingSongInfoProps> = (props: PlayingSo
             >
                 <SkipNext />
             </IconButton>
-        );
+        )
     }
 
     const getPlaybackButtons = (): JSX.Element => {
@@ -80,39 +81,39 @@ export const PlayingSongInfo: React.FC<PlayingSongInfoProps> = (props: PlayingSo
                 </IconButton>
                 {getNextButton()}
             </span>
-        );
+        )
     }
 
     const getProgressBar = (): JSX.Element => {
         if (props.totalDuration === null) {
-            return (<></>);
+            return (<></>)
         }
 
-        const currentPlaybackTime = props.currentPlaybackTime ?? 0;
+        const currentPlaybackTime = props.currentPlaybackTime ?? 0
 
-        const percentPlayed = (currentPlaybackTime / props.totalDuration) * 100;
-        const percentPlayedValue = percentPlayed === null ? 0 : percentPlayed;
-        const width = `${percentPlayedValue}%`;
-        const currentPlaybackTimeText = parseNumberAsMinutesText(currentPlaybackTime);
-        const totalDurationText = parseNumberAsMinutesText(props.totalDuration);
+        const percentPlayed = (currentPlaybackTime / props.totalDuration) * 100
+        const percentPlayedValue = percentPlayed === null ? 0 : percentPlayed
+        const width = `${percentPlayedValue}%`
+        const currentPlaybackTimeText = parseNumberAsMinutesText(currentPlaybackTime)
+        const totalDurationText = parseNumberAsMinutesText(props.totalDuration)
 
         const timeText = `${currentPlaybackTimeText} / ${totalDurationText}`
 
         return (
             <>
                 <div className={classes.progressBarContainer}>
-                    <div className={classes.progressBarFill} style={{ width: width }}>
+                    <div className={classes.progressBarFill} style={{ width }}>
                     </div>
                 </div>
                 <div>
                     {timeText}
                 </div>
             </>
-        );
+        )
     }
 
     const getPlayingSongInfo = (): JSX.Element => {
-        if (props.playingSound && props.playingSound) {
+        if ((props.playingSound != null) && props.playingSound !== undefined) {
             return (
                 <div className={classes.songInfoContainer}>
                     {getProgressBar()}
@@ -128,10 +129,10 @@ export const PlayingSongInfo: React.FC<PlayingSongInfoProps> = (props: PlayingSo
                         />
                     </div>
                 </div>
-            );
+            )
         }
-        return (<></>);
+        return (<></>)
     }
 
-    return getPlayingSongInfo();
-};
+    return getPlayingSongInfo()
+}

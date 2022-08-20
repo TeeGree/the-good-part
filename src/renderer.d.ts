@@ -1,22 +1,21 @@
 import { IAudioMetadata } from 'music-metadata';
-import { AppSettings, AppSettingsFromFile } from './models/AppSettings';
-import { SongInfo } from './models/SongInfo';
+import { AppSettings } from './models/AppSettings';
 
 export interface IElectronAPI {
-    getFileMetadata: (filepath: string) => Promise<IAudioMetadata>,
-    getSettings: () => Promise<AppSettings>,
-    uploadFile: (filepath: string) => Promise<void>
+    getFileMetadata: (filepath: string) => Promise<IAudioMetadata>;
+    getSettings: () => Promise<AppSettings>;
+    uploadFile: (filepath: string) => Promise<void>;
 }
 
 declare global {
     interface Window {
-        electron: IElectronAPI
+        electron: IElectronAPI;
     }
 }
 
 declare module '*.scss' {
     const classes: {
-        [k: string]: string,
-    }
+        [k: string]: string;
+    };
     export = classes;
 }

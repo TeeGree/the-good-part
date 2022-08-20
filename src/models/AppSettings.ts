@@ -1,15 +1,15 @@
-import { SongInfo } from "./SongInfo"
+import { SongInfo } from './SongInfo';
 
 export interface SongInfoFromSettings {
-    id: string,
-    filename: string
+    id: string;
+    filename: string;
 }
 
 export interface AppSettings {
-    songs: SongInfo[],
-    songMap: Map<string, SongInfo>
+    songs: SongInfo[];
+    songMap: Map<string, SongInfo>;
 }
 
 export interface AppSettingsFromFile {
-    songs: SongInfoFromSettings[]
+    songs: SongInfoFromSettings[];
 }
