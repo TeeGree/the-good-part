@@ -11,12 +11,11 @@ import { UploadFile } from './components/pages/UploadFile';
 import { NavPanel } from './components/NavPanel';
 import { getFilenameFromPath } from './utility/FilePathUtils';
 import { SongInfo } from './models/SongInfo';
+import { defaultVolume } from './redux/state/volumeState';
 
 // Needed to polyfill dependencies that have been removed from Node.
 window.Buffer = Buffer;
 window.process = process;
-
-const defaultVolume = 0.5;
 
 Howler.volume(defaultVolume);
 
@@ -30,17 +29,12 @@ const App: React.FC = () => {
     const [totalDuration, setTotalDuration] = useState<number | null>(null);
     const [isPaused, setIsPaused] = useState<boolean>(false);
     const [appSettings, setAppSettings] = useState<AppSettings>();
-    const [volume, setVolume] = useState<number>(defaultVolume);
 
     useEffect(() => {
         void window.electron.getSettings().then((settings) => {
             setAppSettings(settings);
         });
     }, []);
-
-    useEffect(() => {
-        Howler.volume(volume);
-    }, [volume]);
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -140,10 +134,6 @@ const App: React.FC = () => {
         setIsPaused(false);
     };
 
-    const changeVolume = (value: number): void => {
-        setVolume(value);
-    };
-
     const getPlayingSongInfo = (): JSX.Element => {
         if (playingSound != null) {
             return (
@@ -157,8 +147,6 @@ const App: React.FC = () => {
                         isPaused={isPaused}
                         currentPlaybackTime={currentPlaybackTime}
                         totalDuration={totalDuration}
-                        volume={volume}
-                        changeVolume={changeVolume}
                         playNextSong={playNextSong}
                         playPreviousSong={playPreviousSong}
                         canPlayNextSong={canPlayNextSong()}

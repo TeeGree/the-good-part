@@ -5,11 +5,8 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 import Tooltip from '@mui/material/Tooltip';
 import React, { useState } from 'react';
 import classes from './VolumeContainer.module.scss';
-
-interface VolumeContainerProps {
-    volume: number;
-    changeVolume: (volume: number) => void;
-}
+import { useAppDispatch, useAppSelector } from '../redux/hooks';
+import { SET_VOLUME } from '../redux/actions/VolumeActions';
 
 // TODO: integrate theme throughout the app
 const theme = createTheme({
@@ -20,29 +17,40 @@ const theme = createTheme({
     }
 });
 
-export const VolumeContainer: React.FC<VolumeContainerProps> = (props: VolumeContainerProps) => {
+const minAdjustment = 0.01;
+
+export const VolumeContainer: React.FC = () => {
+	const dispatch = useAppDispatch();
+
     const [hoveredOverSlider, setHoveredOverSlider] = useState(false);
     const [hoveredOverMinus, setHoveredOverMinus] = useState(false);
     const [hoveredOverPlus, setHoveredOverPlus] = useState(false);
 
+	const volume = useAppSelector(state => state.volume?.volume ?? 0);
+
+	const changeVolume = (value: number): void => {
+		Howler.volume(value);
+		dispatch({ type: SET_VOLUME, volume: value });
+	}
+
     const onSliderChange = (_: Event, value: number | number[]): void => {
-        props.changeVolume(value as number);
+        changeVolume(value as number);
     };
 
     const getFormattedVolume = (): string => {
-        const volumePct = Math.floor(props.volume * 100);
+        const volumePct = Math.floor(volume * 100);
         return `${volumePct}%`;
     };
 
     const lowerVolumeByOne = (): void => {
-        if (props.volume > 0) {
-            props.changeVolume(props.volume - 0.01);
+        if (volume > 0) {
+            changeVolume(volume - minAdjustment);
         }
     };
 
     const raiseVolumeByOne = (): void => {
-        if (props.volume < 1) {
-            props.changeVolume(props.volume + 0.01);
+        if (volume < 1) {
+            changeVolume(volume + minAdjustment);
         }
     };
 
@@ -61,7 +69,7 @@ export const VolumeContainer: React.FC<VolumeContainerProps> = (props: VolumeCon
                             className={classes.volumeIcon}
                             color="inherit"
                             onClick={lowerVolumeByOne}
-                            disabled={props.volume === 0}
+                            disabled={volume === 0}
                         >
                             <Remove />
                         </IconButton>
@@ -70,7 +78,7 @@ export const VolumeContainer: React.FC<VolumeContainerProps> = (props: VolumeCon
                             onMouseLeave={() => setHoveredOverSlider(false)}
                             className={classes.volumeSliderContainer}
                             aria-label="Volume"
-                            value={props.volume}
+                            value={volume}
                             onChange={onSliderChange}
                             step={0.01}
                             min={0}
@@ -83,7 +91,7 @@ export const VolumeContainer: React.FC<VolumeContainerProps> = (props: VolumeCon
                             className={classes.volumeIcon}
                             color="inherit"
                             onClick={raiseVolumeByOne}
-                            disabled={props.volume === 1}
+                            disabled={volume === 1}
                         >
                             <Add />
                         </IconButton>

@@ -19,8 +19,6 @@ interface PlayingSongInfoProps {
     isPaused: boolean
     currentPlaybackTime: number | null
     totalDuration: number | null
-    volume: number
-    changeVolume: (volume: number) => void
     playNextSong: () => void
     playPreviousSong: () => void
     canPlayNextSong: boolean
@@ -123,10 +121,7 @@ export const PlayingSongInfo: React.FC<PlayingSongInfoProps> = (props: PlayingSo
                             fileMetadata={props.fileMetadata}
                         />
                         {getPlaybackButtons()}
-                        <VolumeContainer
-                            volume={props.volume}
-                            changeVolume={props.changeVolume}
-                        />
+                        <VolumeContainer />
                     </div>
                 </div>
             )
