@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { SyntheticEvent, useState } from 'react'
 import { Howl } from 'howler'
 import { IAudioMetadata } from 'music-metadata'
 import classes from './PlayingSongInfo.module.scss'
@@ -9,34 +9,41 @@ import { parseNumberAsMinutesText } from '../utility/StringUtils'
 import { SongTitleContainer } from './SongTitleContainer'
 import { VolumeContainer } from './VolumeContainer'
 import { SkipNext, SkipPrevious } from '@mui/icons-material'
+import Slider from '@mui/material/Slider'
+import { SxProps, Theme } from '@mui/material/styles'
 
 interface PlayingSongInfoProps {
-    nameOfFile?: string
-    fileMetadata?: IAudioMetadata
-    playingSound?: Howl
-    onPause: () => void
-    onPlay: () => void
-    isPaused: boolean
-    currentPlaybackTime: number | null
-    totalDuration: number | null
-    playNextSong: () => void
-    playPreviousSong: () => void
-    canPlayNextSong: boolean
-    canPlayPreviousSong: boolean
+    nameOfFile?: string,
+    fileMetadata?: IAudioMetadata,
+    playingSound?: Howl,
+    onPause: (shouldSetPauseState: boolean) => void,
+    onPlay: () => void,
+    isPaused: boolean,
+    currentPlaybackTime: number | null,
+    totalDuration: number | null,
+    playNextSong: () => void,
+    playPreviousSong: () => void,
+    canPlayNextSong: boolean,
+    canPlayPreviousSong: boolean,
+    setPlaybackTime: (value: number) => void,
+    seekToPosition: (pos: number) => void,
 };
 
 export const PlayingSongInfo: React.FC<PlayingSongInfoProps> = (props: PlayingSongInfoProps) => {
+
+    const [hoveredOverPlaybackSlider, setHoveredOverPlaybackSlider] = useState(false);
+
     const togglePlay = (): void => {
         if (props.isPaused) {
-            props.onPlay()
+            props.onPlay();
         } else {
-            props.onPause()
+            props.onPause(true);
         }
     }
 
     const getPreviousButton = (): JSX.Element => {
         if (!props.canPlayPreviousSong) {
-            return (<></>)
+            return (<></>);
         }
 
         return (
@@ -47,12 +54,12 @@ export const PlayingSongInfo: React.FC<PlayingSongInfoProps> = (props: PlayingSo
             >
                 <SkipPrevious />
             </IconButton>
-        )
+        );
     }
 
     const getNextButton = (): JSX.Element => {
         if (!props.canPlayNextSong) {
-            return (<></>)
+            return (<></>);
         }
 
         return (
@@ -63,7 +70,7 @@ export const PlayingSongInfo: React.FC<PlayingSongInfoProps> = (props: PlayingSo
             >
                 <SkipNext />
             </IconButton>
-        )
+        );
     }
 
     const getPlaybackButtons = (): JSX.Element => {
@@ -79,35 +86,80 @@ export const PlayingSongInfo: React.FC<PlayingSongInfoProps> = (props: PlayingSo
                 </IconButton>
                 {getNextButton()}
             </span>
-        )
+        );
+    }
+
+    const getSliderStyles = (): SxProps<Theme> => {
+        const styles: SxProps<Theme> = {
+            color: 'purple',
+            padding: 0,
+            height: '5px',
+            borderRadius: 0,
+            display: 'inherit',
+            overflowX: 'clip',
+            '& .MuiSlider-rail': {
+                backgroundColor: 'lightblue',
+                opacity: 1,
+            },
+        }
+
+        if (!hoveredOverPlaybackSlider) {
+            styles['& .MuiSlider-thumb'] = {
+                display: 'none',
+            }
+        }
+
+        return styles;
+    }
+
+    const onSliderChange = (_: Event, value: number | number[]): void => {
+        if (!props.isPaused) {
+            props.onPause(false);
+        }
+
+        props.setPlaybackTime(value as number);
+    };
+
+    const onSliderChangeCommitted = (_: Event | SyntheticEvent<Element, Event>, value: number | number[]): void => {
+        props.seekToPosition(value as number);
+
+        if (!props.isPaused) {
+            props.onPlay();
+        }
     }
 
     const getProgressBar = (): JSX.Element => {
         if (props.totalDuration === null) {
-            return (<></>)
+            return (<></>);
         }
 
-        const currentPlaybackTime = props.currentPlaybackTime ?? 0
+        const currentPlaybackTime = props.currentPlaybackTime ?? 0;
 
-        const percentPlayed = (currentPlaybackTime / props.totalDuration) * 100
-        const percentPlayedValue = percentPlayed === null ? 0 : percentPlayed
-        const width = `${percentPlayedValue}%`
-        const currentPlaybackTimeText = parseNumberAsMinutesText(currentPlaybackTime)
-        const totalDurationText = parseNumberAsMinutesText(props.totalDuration)
+        const currentPlaybackTimeText = parseNumberAsMinutesText(currentPlaybackTime);
+        const totalDurationText = parseNumberAsMinutesText(props.totalDuration);
 
-        const timeText = `${currentPlaybackTimeText} / ${totalDurationText}`
+        const timeText = `${currentPlaybackTimeText} / ${totalDurationText}`;
 
         return (
             <>
-                <div className={classes.progressBarContainer}>
-                    <div className={classes.progressBarFill} style={{ width }}>
-                    </div>
-                </div>
+                <Slider
+                    onMouseEnter={() => setHoveredOverPlaybackSlider(true)}
+                    onMouseLeave={() => setHoveredOverPlaybackSlider(false)}
+                    className="progressBarContainer"
+                    aria-label="playback"
+                    value={currentPlaybackTime}
+                    onChange={onSliderChange}
+                    onChangeCommitted={onSliderChangeCommitted}
+                    step={0.01}
+                    min={0}
+                    max={props.totalDuration}
+                    sx={getSliderStyles()}
+                />
                 <div>
                     {timeText}
                 </div>
             </>
-        )
+        );
     }
 
     const getPlayingSongInfo = (): JSX.Element => {

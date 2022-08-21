@@ -124,9 +124,11 @@ const App: React.FC = () => {
         });
     };
 
-    const pausePlayingSong = (): void => {
+    const pausePlayingSong = (shouldSetPauseState: boolean): void => {
         playingSound?.pause();
-        setIsPaused(true);
+        if (shouldSetPauseState) {
+            setIsPaused(true);
+        }
     };
 
     const resumePlayingSong = (): void => {
@@ -134,8 +136,16 @@ const App: React.FC = () => {
         setIsPaused(false);
     };
 
+    const seekToPosition = (pos: number): void => {
+        if (playingSound !== undefined) {
+            playingSound.once('play', () => {
+                playingSound.seek(pos);
+            });
+        }
+    }
+
     const getPlayingSongInfo = (): JSX.Element => {
-        if (playingSound != null) {
+        if (playingSound !== undefined) {
             return (
                 <div className={classes.playingSongInfo}>
                     <PlayingSongInfo
@@ -151,6 +161,8 @@ const App: React.FC = () => {
                         playPreviousSong={playPreviousSong}
                         canPlayNextSong={canPlayNextSong()}
                         canPlayPreviousSong={canPlayPreviousSong()}
+                        setPlaybackTime={setCurrentPlaybackTime}
+                        seekToPosition={seekToPosition}
                     />
                 </div>
             );
@@ -210,7 +222,7 @@ const App: React.FC = () => {
                                 <Library
                                     appSettings={appSettings}
                                     playSong={playSong}
-                                    onPause={pausePlayingSong}
+                                    onPause={() => pausePlayingSong(true)}
                                     onResume={resumePlayingSong}
                                     isPaused={isPaused}
                                     playingSongId={playingSongId}

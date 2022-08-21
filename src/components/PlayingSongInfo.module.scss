@@ -1,15 +1,9 @@
-$playingSongInfoHeight: 102px;
+$playingSongInfoHeight: 87px;
 
 .songInfoContainer {
     position: relative;
     width: 100%;
     background-color: darkslateblue;
-}
-
-.progressBarContainer {
-    height: 20px;
-    width: 100%;
-    background-color: lightblue;
 }
 
 .progressBarFill {
