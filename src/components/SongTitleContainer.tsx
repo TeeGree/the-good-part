@@ -1,7 +1,8 @@
-import Tooltip from '@mui/material/Tooltip'
-import { IAudioMetadata } from 'music-metadata'
-import React, { useEffect, useRef, useState } from 'react'
-import classes from './SongTitleContainer.module.scss'
+import { IAudioMetadata } from 'music-metadata';
+import React from 'react';
+import { getFilenameWithoutExtension } from '../utility/FilePathUtils';
+import classes from './SongTitleContainer.module.scss';
+import { TooltipOnOverflow } from './TooltipOnOverflow';
 
 interface SongTitleContainerProps {
   nameOfFile?: string
@@ -9,30 +10,6 @@ interface SongTitleContainerProps {
 }
 
 export const SongTitleContainer: React.FC<SongTitleContainerProps> = (props: SongTitleContainerProps) => {
-    const songTitleElementRef = useRef<HTMLInputElement | null>(null)
-    const [showTooltip, setShouldShowTooltip] = useState(false)
-
-    const getShouldShowTooltip = (): boolean => {
-        const offsetWidth = songTitleElementRef?.current?.offsetWidth ?? 0
-        const scrollWidth = songTitleElementRef?.current?.scrollWidth ?? 0
-        return offsetWidth < scrollWidth
-    }
-
-    useEffect(() => {
-        const handleResize = (): void => {
-            setShouldShowTooltip(getShouldShowTooltip())
-        }
-
-        if (songTitleElementRef.current != null) {
-            setShouldShowTooltip(getShouldShowTooltip())
-        }
-
-        window.addEventListener('resize', handleResize)
-
-        return () => {
-            window.removeEventListener('resize', handleResize)
-        }
-    }, [songTitleElementRef])
 
     const getSongTitleContainer = (): JSX.Element => {
         return (
@@ -40,15 +17,13 @@ export const SongTitleContainer: React.FC<SongTitleContainerProps> = (props: Son
                 {getSongTitle()}
                 {getArtist()}
             </div>
-        )
+        );
     }
 
     const getSongTitle = (): JSX.Element => {
         return (
-            <div ref={songTitleElementRef} className={classes.songTitle}>
-                {getSongTitleText()}
-            </div>
-        )
+            <TooltipOnOverflow text={getSongTitleText()} />
+        );
     }
 
     const getArtist = (): JSX.Element => {
@@ -56,48 +31,25 @@ export const SongTitleContainer: React.FC<SongTitleContainerProps> = (props: Son
             <div className={classes.artistName}>
                 {getArtistText()}
             </div>
-        )
+        );
     }
 
     const getArtistText = (): string => {
-        return props.fileMetadata?.common?.artist ?? ''
+        return props.fileMetadata?.common?.artist ?? '';
     }
 
     const getSongTitleText = (): string => {
-        const fallbackFilename = props.nameOfFile
-        const title = props.fileMetadata?.common?.title
+        const fallbackFilename = props.nameOfFile;
+        const title = props.fileMetadata?.common?.title;
 
         if (title !== undefined) {
-            return title
+            return title;
         } else if (fallbackFilename !== undefined) {
-            return fallbackFilename
+            return getFilenameWithoutExtension(fallbackFilename);
         }
 
-        return 'Unknown'
+        return 'Unknown';
     }
 
-    const getSongHoverText = (): string => {
-        let songInfoText = getSongTitleText()
-        const artist = getArtistText()
-
-        if (artist !== undefined) {
-            songInfoText += ` by ${artist}`
-        }
-
-        return songInfoText
-    }
-
-    const getElements = (): JSX.Element => {
-        if (showTooltip) {
-            return (
-                <Tooltip placement="top" title={getSongHoverText()}>
-                    {getSongTitleContainer()}
-                </Tooltip>
-            )
-        }
-
-        return getSongTitleContainer()
-    }
-
-    return getElements()
+    return getSongTitleContainer();
 }

@@ -12,6 +12,8 @@ import classes from './Library.module.scss';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
 import IconButton from '@mui/material/IconButton';
+import { TooltipOnOverflow } from '../TooltipOnOverflow';
+import { getFilenameWithoutExtension } from '../../utility/FilePathUtils';
 
 interface LibraryProps {
     appSettings: AppSettings | undefined;
@@ -50,6 +52,14 @@ export const Library: React.FC<LibraryProps> = (props: LibraryProps) => {
         );
     };
 
+    const getTitle = (title: string | undefined, filename: string): string => {
+        if (title !== undefined) {
+            return title;
+        }
+        
+        return getFilenameWithoutExtension(filename);
+    }
+
     const getRowForSong = (index: number, song: SongInfo): JSX.Element => {
         if (song.metadata === undefined) {
             return <></>;
@@ -60,13 +70,31 @@ export const Library: React.FC<LibraryProps> = (props: LibraryProps) => {
         const durationText = parseNumberAsMinutesText(metadata.format.duration ?? 0);
         return (
             <TableRow key={index}>
-                <TableCell className={classes.tableCell}>{getPlaybackIcon(song, index)}</TableCell>
                 <TableCell className={classes.tableCell}>
-                    {commonMetadata.title ?? song.filename}
+                    <div className={classes.playButtonCell}>
+                        {getPlaybackIcon(song, index)}
+                    </div>
                 </TableCell>
-                <TableCell className={classes.tableCell}>{commonMetadata.artist}</TableCell>
-                <TableCell className={classes.tableCell}>{commonMetadata.album}</TableCell>
-                <TableCell className={classes.tableCell}>{durationText}</TableCell>
+                <TableCell className={classes.tableCell}>
+                    <div className={classes.tableCellText}>
+                        <TooltipOnOverflow text={getTitle(commonMetadata.title, song.filename)} />
+                    </div>
+                </TableCell>
+                <TableCell className={classes.tableCell}>
+                    <div className={classes.tableCellText}>
+                        <TooltipOnOverflow text={commonMetadata.artist} />
+                    </div>
+                </TableCell>
+                <TableCell className={classes.tableCell}>
+                    <div className={classes.tableCellText}>
+                        <TooltipOnOverflow text={commonMetadata.album} />
+                    </div>
+                </TableCell>
+                <TableCell className={classes.tableCell}>
+                    <div className={classes.durationCell}>
+                        {durationText}
+                    </div>
+                </TableCell>
             </TableRow>
         );
     };
