@@ -12,26 +12,26 @@ import { SET_VOLUME } from '../redux/actions/VolumeActions';
 const theme = createTheme({
     palette: {
         primary: {
-            main: '#ffffff'
-        }
-    }
+            main: '#ffffff',
+        },
+    },
 });
 
 const minAdjustment = 0.01;
 
 export const VolumeContainer: React.FC = () => {
-	const dispatch = useAppDispatch();
+    const dispatch = useAppDispatch();
 
     const [hoveredOverSlider, setHoveredOverSlider] = useState(false);
     const [hoveredOverMinus, setHoveredOverMinus] = useState(false);
     const [hoveredOverPlus, setHoveredOverPlus] = useState(false);
 
-	const volume = useAppSelector(state => state.volume?.volume ?? 0);
+    const volume = useAppSelector((state) => state.volume?.volume ?? 0);
 
-	const changeVolume = (value: number): void => {
-		Howler.volume(value);
-		dispatch({ type: SET_VOLUME, volume: value });
-	}
+    const changeVolume = (value: number): void => {
+        Howler.volume(value);
+        dispatch({ type: SET_VOLUME, volume: value });
+    };
 
     const onSliderChange = (_: Event, value: number | number[]): void => {
         changeVolume(value as number);

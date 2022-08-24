@@ -3,10 +3,12 @@ import React, { useEffect, useRef, useState } from 'react';
 import classes from './TooltipOnOverflow.module.scss';
 
 interface TooltipOnOverflowProps {
-    text?: string
+    text?: string;
 }
 
-export const TooltipOnOverflow: React.FC<TooltipOnOverflowProps> = (props: TooltipOnOverflowProps) => {
+export const TooltipOnOverflow: React.FC<TooltipOnOverflowProps> = (
+    props: TooltipOnOverflowProps,
+) => {
     const elementRef = useRef<HTMLInputElement | null>(null);
     const [showTooltip, setShouldShowTooltip] = useState(false);
 
@@ -14,12 +16,12 @@ export const TooltipOnOverflow: React.FC<TooltipOnOverflowProps> = (props: Toolt
         const offsetWidth = elementRef?.current?.offsetWidth ?? 0;
         const scrollWidth = elementRef?.current?.scrollWidth ?? 0;
         return offsetWidth < scrollWidth;
-    }
+    };
 
     useEffect(() => {
         const handleResize = (): void => {
             setShouldShowTooltip(getShouldShowTooltip());
-        }
+        };
 
         if (elementRef.current != null) {
             setShouldShowTooltip(getShouldShowTooltip());
@@ -32,13 +34,11 @@ export const TooltipOnOverflow: React.FC<TooltipOnOverflowProps> = (props: Toolt
         };
     }, [elementRef, props.text]);
 
-    const getTextElement = (): JSX.Element => {
-        return (
-            <div ref={elementRef} className={classes.container}>
-                {props.text}
-            </div>
-        );
-    }
+    const getTextElement = (): JSX.Element => (
+        <div ref={elementRef} className={classes.container}>
+            {props.text}
+        </div>
+    );
 
     const getElements = (): JSX.Element => {
         if (showTooltip && props.text !== undefined) {
@@ -46,11 +46,11 @@ export const TooltipOnOverflow: React.FC<TooltipOnOverflowProps> = (props: Toolt
                 <Tooltip placement="top" title={props.text}>
                     {getTextElement()}
                 </Tooltip>
-            )
+            );
         }
 
         return getTextElement();
-    }
+    };
 
     return getElements();
-}
+};

@@ -1,0 +1,6 @@
+{
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true,
+    "breadcrumbs.enabled": true,
+    "editor.hover.enabled": true
+}

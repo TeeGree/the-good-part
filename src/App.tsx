@@ -2,10 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { Howl } from 'howler';
 import { Buffer } from 'buffer';
 import * as process from 'process';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { PlayingSongInfo } from './components/PlayingSongInfo';
 import classes from './App.module.scss';
 import { AppSettings } from './models/AppSettings';
-import { Routes, Route, Navigate } from 'react-router-dom';
 import { Library } from './components/pages/Library';
 import { UploadFile } from './components/pages/UploadFile';
 import { NavPanel } from './components/NavPanel';
@@ -31,14 +31,22 @@ const App: React.FC = () => {
     const [appSettings, setAppSettings] = useState<AppSettings>();
 
     useEffect(() => {
-        void window.electron.getSettings().then((settings) => {
+        window.electron.getSettings().then((settings) => {
             setAppSettings(settings);
         });
     }, []);
 
+    const clearPlayingSong = (): void => {
+        setPlayingSound(undefined);
+        setCurrentPlaybackTime(null);
+        setTotalDuration(null);
+        setPlayingSongId(undefined);
+        setPlayingSong(undefined);
+    };
+
     useEffect(() => {
         const interval = setInterval(() => {
-            if ((playingSound?.playing()) === true) {
+            if (playingSound?.playing() === true) {
                 const duration = playingSound.duration();
                 const playbackPosition = playingSound.seek();
                 if (duration === playbackPosition) {
@@ -51,14 +59,6 @@ const App: React.FC = () => {
         }, 100);
         return () => clearInterval(interval);
     }, [playingSound]);
-
-    const clearPlayingSong = (): void => {
-        setPlayingSound(undefined);
-        setCurrentPlaybackTime(null);
-        setTotalDuration(null);
-        setPlayingSongId(undefined);
-        setPlayingSong(undefined);
-    };
 
     const playSong = (index: number): void => {
         const songId = appSettings?.songs[index].id;
@@ -78,7 +78,7 @@ const App: React.FC = () => {
 
         const howlerSound = new Howl({
             src: [filepath],
-            preload: true
+            preload: true,
         });
 
         howlerSound.once('play', () => {
@@ -142,7 +142,7 @@ const App: React.FC = () => {
                 playingSound.seek(pos);
             });
         }
-    }
+    };
 
     const getPlayingSongInfo = (): JSX.Element => {
         if (playingSound !== undefined) {
@@ -246,6 +246,6 @@ const App: React.FC = () => {
             </div>
         </div>
     );
-}
+};
 
 export default App;

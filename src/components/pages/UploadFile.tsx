@@ -1,6 +1,6 @@
 import React, { ChangeEvent } from 'react';
-import classes from './UploadFile.module.scss';
 import Button from '@mui/material/Button';
+import classes from './UploadFile.module.scss';
 
 interface SelectFileProps {
     onLoadFile: (file: File) => Promise<void>;
@@ -8,10 +8,11 @@ interface SelectFileProps {
 }
 
 export const UploadFile: React.FC<SelectFileProps> = (props: SelectFileProps) => {
+    const { fileInputLabel, onLoadFile } = props;
     const openFile = (event: ChangeEvent<HTMLInputElement>): void => {
         if (event.target.files !== null && event.target.files.length > 0) {
             const file: File = event.target.files[0];
-            void props.onLoadFile(file);
+            onLoadFile(file);
         }
     };
 
@@ -20,7 +21,7 @@ export const UploadFile: React.FC<SelectFileProps> = (props: SelectFileProps) =>
             <input id="fileUpload" type="file" className={classes.hidden} onChange={openFile} />
             <label htmlFor="fileUpload">
                 <Button variant="contained" color="primary" component="span">
-                    {props.fileInputLabel}
+                    {fileInputLabel}
                 </Button>
             </label>
         </div>

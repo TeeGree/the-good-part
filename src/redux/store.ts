@@ -1,10 +1,10 @@
-import { configureStore } from "@reduxjs/toolkit";
-import { volumeReducer } from "./reducers/volumeReducer";
+import { configureStore } from '@reduxjs/toolkit';
+import { volumeReducer } from './reducers/volumeReducer';
 
 export const store = configureStore({
     reducer: {
-        volume: volumeReducer
-    }
+        volume: volumeReducer,
+    },
 });
 
 export type RootState = ReturnType<typeof store.getState>;

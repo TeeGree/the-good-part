@@ -5,38 +5,27 @@ import classes from './SongTitleContainer.module.scss';
 import { TooltipOnOverflow } from './TooltipOnOverflow';
 
 interface SongTitleContainerProps {
-  nameOfFile?: string
-  fileMetadata?: IAudioMetadata
+    nameOfFile?: string;
+    fileMetadata?: IAudioMetadata;
 }
 
-export const SongTitleContainer: React.FC<SongTitleContainerProps> = (props: SongTitleContainerProps) => {
+export const SongTitleContainer: React.FC<SongTitleContainerProps> = (
+    props: SongTitleContainerProps,
+) => {
+    const getSongTitleContainer = (): JSX.Element => (
+        <div className={classes.songTitleContainer}>
+            {getSongTitle()}
+            {getArtist()}
+        </div>
+    );
 
-    const getSongTitleContainer = (): JSX.Element => {
-        return (
-            <div className={classes.songTitleContainer}>
-                {getSongTitle()}
-                {getArtist()}
-            </div>
-        );
-    }
+    const getSongTitle = (): JSX.Element => <TooltipOnOverflow text={getSongTitleText()} />;
 
-    const getSongTitle = (): JSX.Element => {
-        return (
-            <TooltipOnOverflow text={getSongTitleText()} />
-        );
-    }
+    const getArtist = (): JSX.Element => (
+        <div className={classes.artistName}>{getArtistText()}</div>
+    );
 
-    const getArtist = (): JSX.Element => {
-        return (
-            <div className={classes.artistName}>
-                {getArtistText()}
-            </div>
-        );
-    }
-
-    const getArtistText = (): string => {
-        return props.fileMetadata?.common?.artist ?? '';
-    }
+    const getArtistText = (): string => props.fileMetadata?.common?.artist ?? '';
 
     const getSongTitleText = (): string => {
         const fallbackFilename = props.nameOfFile;
@@ -44,12 +33,13 @@ export const SongTitleContainer: React.FC<SongTitleContainerProps> = (props: Son
 
         if (title !== undefined) {
             return title;
-        } else if (fallbackFilename !== undefined) {
+        }
+        if (fallbackFilename !== undefined) {
             return getFilenameWithoutExtension(fallbackFilename);
         }
 
         return 'Unknown';
-    }
+    };
 
     return getSongTitleContainer();
-}
+};
