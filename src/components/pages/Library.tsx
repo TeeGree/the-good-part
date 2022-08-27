@@ -24,8 +24,9 @@ interface LibraryProps {
 }
 
 export const Library: React.FC<LibraryProps> = (props: LibraryProps) => {
+    const { playingSongId, playSong, isPaused, onResume, onPause } = props;
+
     const getPlaybackIcon = (song: SongInfo, index: number): JSX.Element => {
-        const { playingSongId, playSong, isPaused, onResume, onPause } = props;
         // This row's song is not playing.
         if (playingSongId !== song.id) {
             return (
@@ -68,8 +69,9 @@ export const Library: React.FC<LibraryProps> = (props: LibraryProps) => {
         const { metadata } = song;
         const commonMetadata = metadata.common;
         const durationText = parseNumberAsMinutesText(metadata.format.duration ?? 0);
+        const rowClass: string = song.id === playingSongId ? classes.playingRow : '';
         return (
-            <TableRow key={index}>
+            <TableRow key={index} className={rowClass}>
                 <TableCell className={classes.tableCell}>
                     <div className={classes.playButtonCell}>{getPlaybackIcon(song, index)}</div>
                 </TableCell>
