@@ -1,9 +1,5 @@
-import { SongInfo } from './SongInfo';
-
-export interface SongInfoFromSettings {
-    id: string;
-    filename: string;
-}
+import { Playlist } from './Playlist';
+import { SongInfo, SongInfoFromSettings } from './SongInfo';
 
 export interface AppSettings {
     songs: SongInfo[];
@@ -15,11 +11,4 @@ export interface AppSettings {
 export interface AppSettingsFromFile {
     songs: SongInfoFromSettings[];
     playlists: Playlist[];
-}
-
-export interface Playlist {
-    id: string;
-    name: string;
-    songIds: string[];
-    color: string;
 }

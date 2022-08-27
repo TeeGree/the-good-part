@@ -3,13 +3,9 @@ import * as fs from 'fs';
 import { parseFile, IAudioMetadata } from 'music-metadata';
 import { v4 as uuidv4 } from 'uuid';
 import { getFilenameFromPath } from '../utility/FilePathUtils';
-import {
-    AppSettings,
-    AppSettingsFromFile,
-    Playlist,
-    SongInfoFromSettings,
-} from '../models/AppSettings';
-import { SongInfo } from '../models/SongInfo';
+import { AppSettings, AppSettingsFromFile } from '../models/AppSettings';
+import { SongInfo, SongInfoFromSettings } from '../models/SongInfo';
+import { Playlist } from '../models/Playlist';
 
 const configFile = './the-good-part.settings.json';
 

@@ -24,7 +24,7 @@ export const UploadFileButton: React.FC<UploadFileButtonProps> = (props: UploadF
                 <Button
                     className={classes.uploadButton}
                     variant="contained"
-                    sx={{ color: '#ffffff' }}
+                    sx={{ color: '#ffffff', margin: '5px' }}
                     component="span"
                 >
                     <Upload />

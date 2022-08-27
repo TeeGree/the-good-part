@@ -1,7 +1,8 @@
 import { PlayArrow } from '@mui/icons-material';
 import { Card, CardActions, CardContent, IconButton } from '@mui/material';
 import React from 'react';
-import { AppSettings, Playlist } from '../../models/AppSettings';
+import { AppSettings } from '../../models/AppSettings';
+import { Playlist } from '../../models/Playlist';
 import classes from './Playlists.module.scss';
 
 interface PlaylistsProps {

@@ -6,3 +6,8 @@ export interface SongInfo {
     fullPath: string;
     metadata: IAudioMetadata | undefined;
 }
+
+export interface SongInfoFromSettings {
+    id: string;
+    filename: string;
+}
