@@ -258,6 +258,12 @@ const App: React.FC = () => {
         playSong(0, playlistId);
     };
 
+    const createPlaylist = async (name: string): Promise<void> => {
+        await window.electron.createPlaylist(name);
+        const settings = await window.electron.getSettings();
+        setAppSettings(settings);
+    };
+
     return (
         <div className={classes.app}>
             <div className={classes.appContainer}>
@@ -283,7 +289,11 @@ const App: React.FC = () => {
                         <Route
                             path="playlists"
                             element={
-                                <Playlists appSettings={appSettings} playPlaylist={playPlaylist} />
+                                <Playlists
+                                    appSettings={appSettings}
+                                    playPlaylist={playPlaylist}
+                                    createPlaylist={createPlaylist}
+                                />
                             }
                         />
                         <Route path="*" element={<Navigate to="/" replace />} />

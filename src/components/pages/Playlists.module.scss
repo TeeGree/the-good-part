@@ -1,13 +1,23 @@
 .playlistsContainer {
     width: 100%;
+    overflow: auto;
+    display: flex;
 }
 
 .playlist {
     width: 200px;
+    min-width: 200px;
+    max-width: 200px;
     height: 200px;
+    min-height: 200px;
+    max-height: 200px;
     margin: 10px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     font-size: 24px;
+}
+
+.modalButtonContainer {
+    text-align: right;
 }

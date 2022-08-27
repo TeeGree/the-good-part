@@ -21,6 +21,10 @@ export const setupIpcHandlers = (): void => {
     ipcMain.handle('upload-file', async (_, filepath: string) =>
         copyFileToPublicFolder(filepath).catch(() => 'Error uploading file'),
     );
+
+    ipcMain.handle('create-playlist', async (_, name: string) =>
+        addPlaylistToAppSettingsFile(name).catch(() => 'Error creating playlist'),
+    );
 };
 
 const getParsedSettings = async (): Promise<AppSettings> => {
@@ -113,14 +117,25 @@ const copyFileToPublicFolder = async (filepath: string): Promise<void> => {
     const filename = getFilenameFromPath(filepath);
     const targetPath = getFullPathWithPublicElectronFolder(filename);
     await fs.promises.copyFile(filepath, targetPath);
-    await addToAppSettingsFile(filename);
+    await addSongToAppSettingsFile(filename);
 };
 
-const addToAppSettingsFile = async (filename: string): Promise<void> => {
+const addSongToAppSettingsFile = async (filename: string): Promise<void> => {
     const settings = await getSettingsFromFile();
     settings.songs.push({
         id: uuidv4(),
         filename,
+    });
+    await writeSettingsToFile(settings);
+};
+
+const addPlaylistToAppSettingsFile = async (name: string): Promise<void> => {
+    const settings = await getSettingsFromFile();
+    settings.playlists.push({
+        id: uuidv4(),
+        name,
+        color: '#483d8b',
+        songIds: [],
     });
     await writeSettingsToFile(settings);
 };
