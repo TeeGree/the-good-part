@@ -1,16 +1,11 @@
-import QueueMusic from '@mui/icons-material/QueueMusic';
-import Upload from '@mui/icons-material/Upload';
+import { QueueMusic, Upload, ViewComfy } from '@mui/icons-material';
 import Divider from '@mui/material/Divider';
 import Drawer from '@mui/material/Drawer';
 import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
 import Toolbar from '@mui/material/Toolbar';
 import React from 'react';
-import { Link } from 'react-router-dom';
 import classes from './NavPanel.module.scss';
+import { NavPanelItem } from './NavPanelItem';
 
 export const NavPanel: React.FC<{}> = () => (
     <Drawer
@@ -24,26 +19,9 @@ export const NavPanel: React.FC<{}> = () => (
         <Toolbar />
         <Divider />
         <List>
-            <ListItem disablePadding>
-                <Link className={classes.link} to="/">
-                    <ListItemButton>
-                        <ListItemIcon className={classes.icon}>
-                            <QueueMusic />
-                        </ListItemIcon>
-                        <ListItemText primary="Library" />
-                    </ListItemButton>
-                </Link>
-            </ListItem>
-            <ListItem disablePadding>
-                <Link className={classes.link} to="upload-file">
-                    <ListItemButton>
-                        <ListItemIcon className={classes.icon}>
-                            <Upload />
-                        </ListItemIcon>
-                        <ListItemText primary="Upload File" />
-                    </ListItemButton>
-                </Link>
-            </ListItem>
+            <NavPanelItem route="/" label="Library" muiIcon={<QueueMusic />} />
+            <NavPanelItem route="upload-file" label="Upload File" muiIcon={<Upload />} />
+            <NavPanelItem route="playlists" label="Playlists" muiIcon={<ViewComfy />} />
         </List>
         <Divider />
     </Drawer>

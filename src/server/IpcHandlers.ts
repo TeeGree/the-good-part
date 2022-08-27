@@ -3,7 +3,12 @@ import * as fs from 'fs';
 import { parseFile, IAudioMetadata } from 'music-metadata';
 import { v4 as uuidv4 } from 'uuid';
 import { getFilenameFromPath } from '../utility/FilePathUtils';
-import { AppSettings, AppSettingsFromFile, SongInfoFromSettings } from '../models/AppSettings';
+import {
+    AppSettings,
+    AppSettingsFromFile,
+    Playlist,
+    SongInfoFromSettings,
+} from '../models/AppSettings';
 import { SongInfo } from '../models/SongInfo';
 
 const configFile = './the-good-part.settings.json';
@@ -35,6 +40,7 @@ const getSettingsFromFile = async (): Promise<AppSettingsFromFile> => {
     } catch {
         const defaultSettings: AppSettingsFromFile = {
             songs: [],
+            playlists: [],
         };
         await writeSettingsToFile(defaultSettings);
         return defaultSettings;
@@ -82,9 +88,16 @@ const parseAppSettings = async (appSettings: AppSettingsFromFile): Promise<AppSe
         songMap.set(parsedSong.id, parsedSong);
     });
 
+    const playlistMap = new Map<string, Playlist>();
+    appSettings.playlists.forEach((playlist: Playlist) => {
+        playlistMap.set(playlist.id, playlist);
+    });
+
     const parsedSettings: AppSettings = {
         songs,
         songMap,
+        playlists: appSettings.playlists,
+        playlistMap,
     };
 
     return parsedSettings;

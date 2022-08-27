@@ -12,6 +12,7 @@ import { NavPanel } from './components/NavPanel';
 import { getFilenameFromPath } from './utility/FilePathUtils';
 import { SongInfo } from './models/SongInfo';
 import { defaultVolume } from './redux/state/volumeState';
+import { Playlists } from './components/pages/Playlists';
 
 // Needed to polyfill dependencies that have been removed from Node.
 window.Buffer = Buffer;
@@ -22,6 +23,7 @@ Howler.volume(defaultVolume);
 const App: React.FC = () => {
     const [playingSound, setPlayingSound] = useState<Howl>();
     const [playingSong, setPlayingSong] = useState<SongInfo>();
+    const [playingPlaylistId, setPlayingPlaylistId] = useState<string | undefined>(undefined);
     const [nameOfFile, setNameOfFile] = useState<string>();
     const [playingSongId, setPlayingSongId] = useState<string>();
     const [playingSongIndex, setPlayingSongIndex] = useState<number>();
@@ -42,6 +44,7 @@ const App: React.FC = () => {
         setTotalDuration(null);
         setPlayingSongId(undefined);
         setPlayingSong(undefined);
+        setPlayingPlaylistId(undefined);
     };
 
     useEffect(() => {
@@ -60,17 +63,39 @@ const App: React.FC = () => {
         return () => clearInterval(interval);
     }, [playingSound]);
 
-    const playSong = (index: number): void => {
+    const getSongId = (index: number, playlistId?: string): string => {
+        if (playlistId !== undefined) {
+            const playlist = appSettings?.playlistMap?.get(playlistId);
+            if (playlist === undefined || playlist.songIds.length < index + 1) {
+                throw Error('Invalid song index for playlist!');
+            }
+
+            return playlist.songIds[index];
+        }
+
         const songId = appSettings?.songs[index].id;
 
         if (songId === undefined) {
             throw Error('Song index is invalid!');
         }
 
+        return songId;
+    };
+
+    const playSong = (index: number, playlistId?: string): void => {
+        const songId = getSongId(index, playlistId);
+
         const song = appSettings?.songMap.get(songId);
 
         if (song === undefined) {
             throw Error('Song ID is invalid!');
+        }
+
+        if (
+            playlistId !== undefined &&
+            (appSettings?.playlistMap === undefined || !appSettings.playlistMap.has(playlistId))
+        ) {
+            throw Error('Playlist ID is invalid!');
         }
 
         const filepath = `.\\${song.filename}`;
@@ -89,7 +114,8 @@ const App: React.FC = () => {
             if (songId !== undefined) {
                 setPlayingSongId(songId);
                 setPlayingSongIndex(index);
-                setHowlerEndCallback(howlerSound, index);
+                setPlayingPlaylistId(playlistId);
+                setHowlerEndCallback(howlerSound, index, playlistId);
             }
 
             if (isPaused) {
@@ -104,27 +130,32 @@ const App: React.FC = () => {
         howlerSound.play();
     };
 
-    const setHowlerEndCallback = (sound: Howl | undefined, index: number): void => {
+    const setHowlerEndCallback = (
+        sound: Howl | undefined,
+        index: number,
+        playlistId?: string,
+    ): void => {
         if (sound === undefined) {
             return;
         }
         sound.off('end');
         sound.once('end', () => {
-            if (
-                index !== undefined &&
-                appSettings?.songs != null &&
-                appSettings.songs.length > index + 1
-            ) {
-                playSong(index + 1);
+            const length =
+                (playlistId === undefined
+                    ? appSettings?.songs?.length
+                    : appSettings?.playlistMap?.get(playlistId)?.songIds?.length) ?? 0;
+            if (index !== undefined && length > index + 1) {
+                playSong(index + 1, playlistId);
             } else {
                 setPlayingSound(undefined);
                 setPlayingSong(undefined);
                 setPlayingSongId(undefined);
+                setPlayingPlaylistId(undefined);
             }
         });
     };
 
-    const pausePlayingSong = (shouldSetPauseState: boolean): void => {
+    const pausePlayingSong = (shouldSetPauseState: boolean = true): void => {
         playingSound?.pause();
         if (shouldSetPauseState) {
             setIsPaused(true);
@@ -183,32 +214,49 @@ const App: React.FC = () => {
         }
     };
 
+    const getSongsLength = (): number => {
+        const songs =
+            playingPlaylistId === undefined
+                ? appSettings?.songs
+                : appSettings?.playlistMap?.get(playingPlaylistId)?.songIds;
+
+        return songs?.length ?? 0;
+    };
+
     const canPlayNextSong = (): boolean => {
-        if (playingSongIndex === undefined || appSettings?.songs === undefined) {
+        if (playingSongIndex === undefined) {
             return false;
         }
 
-        return playingSongIndex < appSettings.songs.length - 1;
+        const songsLength = getSongsLength();
+
+        return playingSongIndex < songsLength - 1;
     };
 
     const canPlayPreviousSong = (): boolean => {
-        if (playingSongIndex === undefined || appSettings?.songs === undefined) {
+        if (playingSongIndex === undefined) {
             return false;
         }
 
-        return playingSongIndex > 0;
+        const songsLength = getSongsLength();
+
+        return playingSongIndex > 0 && songsLength > 0;
     };
 
     const playNextSong = (): void => {
         if (playingSongIndex !== undefined) {
-            playSong(playingSongIndex + 1);
+            playSong(playingSongIndex + 1, playingPlaylistId);
         }
     };
 
     const playPreviousSong = (): void => {
         if (playingSongIndex !== undefined) {
-            playSong(playingSongIndex - 1);
+            playSong(playingSongIndex - 1, playingPlaylistId);
         }
+    };
+
+    const playPlaylist = (playlistId: string): void => {
+        playSong(0, playlistId);
     };
 
     return (
@@ -222,10 +270,12 @@ const App: React.FC = () => {
                                 <Library
                                     appSettings={appSettings}
                                     playSong={playSong}
-                                    onPause={() => pausePlayingSong(true)}
+                                    onPause={pausePlayingSong}
                                     onResume={resumePlayingSong}
                                     isPaused={isPaused}
-                                    playingSongId={playingSongId}
+                                    playingSongId={
+                                        playingPlaylistId === undefined ? playingSongId : undefined
+                                    }
                                 />
                             }
                         />
@@ -236,6 +286,12 @@ const App: React.FC = () => {
                                     onLoadFile={uploadFile}
                                     fileInputLabel="Choose music file to add to library"
                                 />
+                            }
+                        />
+                        <Route
+                            path="playlists"
+                            element={
+                                <Playlists appSettings={appSettings} playPlaylist={playPlaylist} />
                             }
                         />
                         <Route path="*" element={<Navigate to="/" replace />} />

@@ -5,8 +5,7 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import PlayArrowIcon from '@mui/icons-material/PlayArrow';
-import PauseIcon from '@mui/icons-material/Pause';
+import { Pause, PlayArrow } from '@mui/icons-material';
 import IconButton from '@mui/material/IconButton';
 import { SongInfo } from '../../models/SongInfo';
 import { parseNumberAsMinutesText } from '../../utility/StringUtils';
@@ -31,7 +30,7 @@ export const Library: React.FC<LibraryProps> = (props: LibraryProps) => {
         if (playingSongId !== song.id) {
             return (
                 <IconButton color="inherit" onClick={() => playSong(index)}>
-                    <PlayArrowIcon />
+                    <PlayArrow />
                 </IconButton>
             );
         }
@@ -40,7 +39,7 @@ export const Library: React.FC<LibraryProps> = (props: LibraryProps) => {
         if (isPaused) {
             return (
                 <IconButton color="inherit" onClick={onResume}>
-                    <PlayArrowIcon />
+                    <PlayArrow />
                 </IconButton>
             );
         }
@@ -48,7 +47,7 @@ export const Library: React.FC<LibraryProps> = (props: LibraryProps) => {
         // This row's song is playing and not paused.
         return (
             <IconButton color="inherit" onClick={onPause}>
-                <PauseIcon />
+                <Pause />
             </IconButton>
         );
     };
