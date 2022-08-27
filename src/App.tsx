@@ -7,7 +7,6 @@ import { PlayingSongInfo } from './components/PlayingSongInfo';
 import classes from './App.module.scss';
 import { AppSettings } from './models/AppSettings';
 import { Library } from './components/pages/Library';
-import { UploadFile } from './components/pages/UploadFile';
 import { NavPanel } from './components/NavPanel';
 import { getFilenameFromPath } from './utility/FilePathUtils';
 import { SongInfo } from './models/SongInfo';
@@ -276,13 +275,6 @@ const App: React.FC = () => {
                                     playingSongId={
                                         playingPlaylistId === undefined ? playingSongId : undefined
                                     }
-                                />
-                            }
-                        />
-                        <Route
-                            path="upload-file"
-                            element={
-                                <UploadFile
                                     onLoadFile={uploadFile}
                                     fileInputLabel="Choose music file to add to library"
                                 />

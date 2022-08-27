@@ -1,26 +1,17 @@
-.tableCell {
-    background-color: inherit !important;
-    color: inherit !important;
-    padding: 0 !important;
+$headerHeight: 50px;
+
+.libraryContainer {
+    width: 100%;
+    height: 100%;
+    text-align: right;
 }
 
-$playButtonMaxWidth: 40px;
-$durationMaxWidth: 60px;
-
-.playButtonCell {
-    max-width: $playButtonMaxWidth;
-    min-width: $playButtonMaxWidth;
+.libraryTableContainer {
+    width: 100%;
+    height: calc(100% - $headerHeight);
 }
 
-.durationCell {
-    max-width: $durationMaxWidth;
-    min-width: $durationMaxWidth;
-}
-
-.tableCellText {
-    max-width: 200px;
-}
-
-.playingRow {
-    background-color: grey;
+.libraryHeaderContainer {
+    width: 100%;
+    height: $headerHeight;
 }
