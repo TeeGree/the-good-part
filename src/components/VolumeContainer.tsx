@@ -1,21 +1,11 @@
 import { Add, Remove } from '@mui/icons-material';
 import IconButton from '@mui/material/IconButton';
 import Slider from '@mui/material/Slider';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
 import Tooltip from '@mui/material/Tooltip';
 import React, { useState } from 'react';
 import classes from './VolumeContainer.module.scss';
 import { useAppDispatch, useAppSelector } from '../redux/hooks';
 import { SET_VOLUME } from '../redux/actions/VolumeActions';
-
-// TODO: integrate theme throughout the app
-const theme = createTheme({
-    palette: {
-        primary: {
-            main: '#ffffff',
-        },
-    },
-});
 
 const minAdjustment = 0.01;
 
@@ -56,48 +46,46 @@ export const VolumeContainer: React.FC = () => {
 
     return (
         <span className={classes.volumeContainer}>
-            <ThemeProvider theme={theme}>
-                <Tooltip
-                    placement="top"
-                    title={getFormattedVolume()}
-                    open={hoveredOverMinus || hoveredOverSlider || hoveredOverPlus}
-                >
-                    <span className={classes.volumePartsContainer}>
-                        <IconButton
-                            onMouseEnter={() => setHoveredOverMinus(true)}
-                            onMouseLeave={() => setHoveredOverMinus(false)}
-                            className={classes.volumeIcon}
-                            color="inherit"
-                            onClick={lowerVolumeByOne}
-                            disabled={volume === 0}
-                        >
-                            <Remove />
-                        </IconButton>
-                        <Slider
-                            onMouseEnter={() => setHoveredOverSlider(true)}
-                            onMouseLeave={() => setHoveredOverSlider(false)}
-                            className={classes.volumeSliderContainer}
-                            aria-label="Volume"
-                            value={volume}
-                            onChange={onSliderChange}
-                            step={0.01}
-                            min={0}
-                            max={1}
-                            color="primary"
-                        />
-                        <IconButton
-                            onMouseEnter={() => setHoveredOverPlus(true)}
-                            onMouseLeave={() => setHoveredOverPlus(false)}
-                            className={classes.volumeIcon}
-                            color="inherit"
-                            onClick={raiseVolumeByOne}
-                            disabled={volume === 1}
-                        >
-                            <Add />
-                        </IconButton>
-                    </span>
-                </Tooltip>
-            </ThemeProvider>
+            <Tooltip
+                placement="top"
+                title={getFormattedVolume()}
+                open={hoveredOverMinus || hoveredOverSlider || hoveredOverPlus}
+            >
+                <span className={classes.volumePartsContainer}>
+                    <IconButton
+                        onMouseEnter={() => setHoveredOverMinus(true)}
+                        onMouseLeave={() => setHoveredOverMinus(false)}
+                        className={classes.volumeIcon}
+                        color="inherit"
+                        onClick={lowerVolumeByOne}
+                        disabled={volume === 0}
+                    >
+                        <Remove />
+                    </IconButton>
+                    <Slider
+                        onMouseEnter={() => setHoveredOverSlider(true)}
+                        onMouseLeave={() => setHoveredOverSlider(false)}
+                        className={classes.volumeSliderContainer}
+                        aria-label="Volume"
+                        value={volume}
+                        onChange={onSliderChange}
+                        step={0.01}
+                        min={0}
+                        max={1}
+                        color="primary"
+                    />
+                    <IconButton
+                        onMouseEnter={() => setHoveredOverPlus(true)}
+                        onMouseLeave={() => setHoveredOverPlus(false)}
+                        className={classes.volumeIcon}
+                        color="inherit"
+                        onClick={raiseVolumeByOne}
+                        disabled={volume === 1}
+                    >
+                        <Add />
+                    </IconButton>
+                </span>
+            </Tooltip>
         </span>
     );
 };

@@ -105,7 +105,7 @@ export const LibraryTable: React.FC<LibraryTableProps> = (props: LibraryTablePro
     };
 
     return (
-        <TableContainer>
+        <TableContainer className={classes.tableContainer}>
             <Table>
                 <TableHead>
                     <TableRow>

@@ -3,17 +3,22 @@ import ReactDOM from 'react-dom/client';
 import './index.scss';
 import { BrowserRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { store } from './redux/store';
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 
+const darkTheme = createTheme({ palette: { mode: 'dark' } });
+
 root.render(
     <React.StrictMode>
         <Provider store={store}>
             <BrowserRouter>
-                <App />
+                <ThemeProvider theme={darkTheme}>
+                    <App />
+                </ThemeProvider>
             </BrowserRouter>
         </Provider>
     </React.StrictMode>,

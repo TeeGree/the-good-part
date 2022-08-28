@@ -5,15 +5,14 @@ import {
     Card,
     CardActions,
     CardContent,
-    createTheme,
     IconButton,
     Modal,
     TextField,
-    ThemeProvider,
 } from '@mui/material';
 import React, { useState } from 'react';
 import { AppSettings } from '../../models/AppSettings';
 import { Playlist } from '../../models/Playlist';
+import { modalStyle } from '../../utility/ModalStyle';
 import classes from './Playlists.module.scss';
 
 interface PlaylistsProps {
@@ -21,21 +20,6 @@ interface PlaylistsProps {
     playPlaylist: (playlistId: string) => void;
     createPlaylist: (name: string) => Promise<void>;
 }
-
-const style = {
-    position: 'absolute' as 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: 400,
-    bgcolor: 'background.paper',
-    border: '2px solid #000',
-    boxShadow: 24,
-    color: 'white',
-    p: 4,
-};
-
-const darkTheme = createTheme({ palette: { mode: 'dark' } });
 
 export const Playlists: React.FC<PlaylistsProps> = (props: PlaylistsProps) => {
     const { appSettings, createPlaylist, playPlaylist } = props;
@@ -106,29 +90,27 @@ export const Playlists: React.FC<PlaylistsProps> = (props: PlaylistsProps) => {
                 () => setIsCreatingPlaylist(true),
                 <Add />,
             )}
-            <ThemeProvider theme={darkTheme}>
-                <Modal open={isCreatingPlaylist}>
-                    <Box sx={style}>
-                        <h2>Create new playlist</h2>
-                        <TextField
-                            id="new-playlist-name"
-                            label="Playlist name"
-                            variant="standard"
-                            value={newPlaylistName}
-                            onChange={onNewPlaylistNameChange}
-                        />
-                        <div className={classes.modalButtonContainer}>
-                            <Button
-                                disabled={isCreatePlaylistDisabled}
-                                onClick={createPlaylistAndCloseModal}
-                            >
-                                Create
-                            </Button>
-                            <Button onClick={closeCreatePlaylistModal}>Cancel</Button>
-                        </div>
-                    </Box>
-                </Modal>
-            </ThemeProvider>
+            <Modal open={isCreatingPlaylist}>
+                <Box sx={modalStyle}>
+                    <h2>Create new playlist</h2>
+                    <TextField
+                        id="new-playlist-name"
+                        label="Playlist name"
+                        variant="standard"
+                        value={newPlaylistName}
+                        onChange={onNewPlaylistNameChange}
+                    />
+                    <div className={classes.modalButtonContainer}>
+                        <Button
+                            disabled={isCreatePlaylistDisabled}
+                            onClick={createPlaylistAndCloseModal}
+                        >
+                            Create
+                        </Button>
+                        <Button onClick={closeCreatePlaylistModal}>Cancel</Button>
+                    </div>
+                </Box>
+            </Modal>
         </div>
     );
 };
