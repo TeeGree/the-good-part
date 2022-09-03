@@ -12,28 +12,52 @@ import {
 import React, { useState } from 'react';
 import { AppSettings } from '../../models/AppSettings';
 import { Playlist } from '../../models/Playlist';
+import { SET_APP_SETTINGS } from '../../redux/actions/AppSettingsActions';
+import { useAppDispatch, useAppSelector } from '../../redux/Hooks';
+import { defaultAppSettings } from '../../redux/state/AppSettingsState';
 import { modalStyle } from '../../utility/ModalStyle';
 import classes from './Playlists.module.scss';
 
 interface PlaylistsProps {
-    appSettings: AppSettings | undefined;
     playPlaylist: (playlistId: string) => void;
-    createPlaylist: (name: string) => Promise<void>;
 }
 
 export const Playlists: React.FC<PlaylistsProps> = (props: PlaylistsProps) => {
-    const { appSettings, createPlaylist, playPlaylist } = props;
+    const dispatch = useAppDispatch();
+    const { playPlaylist } = props;
 
     const [isCreatingPlaylist, setIsCreatingPlaylist] = useState(false);
     const [newPlaylistName, setNewPlaylistName] = useState<string>('');
+
+    const appSettings = useAppSelector(
+        (state) => state.appSettings?.appSettings ?? defaultAppSettings,
+    );
+
+    const setAppSettings = (value: AppSettings): void => {
+        dispatch({ type: SET_APP_SETTINGS, appSettings: value });
+    };
+
+    const createPlaylist = async (name: string): Promise<void> => {
+        await window.electron.createPlaylist(name);
+        const settings = await window.electron.getSettings();
+        setAppSettings(settings);
+    };
 
     const createCard = (
         label: string,
         color: string,
         onClick: () => void,
-        muiIcon: React.ReactNode,
+        muiIcon: React.ReactNode | null,
         key?: string,
     ) => {
+        const iconButton =
+            muiIcon === null ? (
+                <></>
+            ) : (
+                <IconButton sx={{ color: '#ffffff' }} onClick={onClick}>
+                    {muiIcon}
+                </IconButton>
+            );
         return (
             <Card
                 key={key}
@@ -44,11 +68,7 @@ export const Playlists: React.FC<PlaylistsProps> = (props: PlaylistsProps) => {
                 }}
             >
                 <CardContent>{label}</CardContent>
-                <CardActions>
-                    <IconButton sx={{ color: '#ffffff' }} onClick={onClick}>
-                        {muiIcon}
-                    </IconButton>
-                </CardActions>
+                <CardActions>{iconButton}</CardActions>
             </Card>
         );
     };
@@ -58,9 +78,10 @@ export const Playlists: React.FC<PlaylistsProps> = (props: PlaylistsProps) => {
             return <></>;
         }
 
-        return appSettings.playlists.map<JSX.Element>((item: Playlist) =>
-            createCard(item.name, item.color, () => playPlaylist(item.id), <PlayArrow />, item.id),
-        );
+        return appSettings.playlists.map<JSX.Element>((item: Playlist) => {
+            const icon = item.songIds.length > 0 ? <PlayArrow /> : null;
+            return createCard(item.name, item.color, () => playPlaylist(item.id), icon, item.id);
+        });
     };
 
     const closeCreatePlaylistModal = (): void => {

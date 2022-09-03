@@ -6,22 +6,20 @@ import { Provider } from 'react-redux';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import { store } from './redux/store';
+import { store } from './redux/Store';
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 
 const darkTheme = createTheme({ palette: { mode: 'dark' } });
 
 root.render(
-    <React.StrictMode>
-        <Provider store={store}>
-            <BrowserRouter>
-                <ThemeProvider theme={darkTheme}>
-                    <App />
-                </ThemeProvider>
-            </BrowserRouter>
-        </Provider>
-    </React.StrictMode>,
+    <Provider store={store}>
+        <BrowserRouter>
+            <ThemeProvider theme={darkTheme}>
+                <App />
+            </ThemeProvider>
+        </BrowserRouter>
+    </Provider>,
 );
 
 // If you want to start measuring performance in your app, pass a function

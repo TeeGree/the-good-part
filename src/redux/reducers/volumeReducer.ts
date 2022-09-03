@@ -1,6 +1,6 @@
 import { Reducer } from 'react';
 import { SET_VOLUME, VolumeAction } from '../actions/VolumeActions';
-import { VolumeState, defaultVolume } from '../state/volumeState';
+import { VolumeState, defaultVolume } from '../state/VolumeState';
 
 const initialState: VolumeState = {
     volume: defaultVolume,

@@ -11,7 +11,6 @@ interface LibraryProps {
     isPaused: boolean;
     onPause: () => void;
     onResume: () => void;
-    onLoadFile: (file: File) => Promise<void>;
     fileInputLabel: string;
     addSongToPlaylist: (playlistId: string, songId: string) => Promise<void>;
 }
@@ -24,7 +23,6 @@ export const Library: React.FC<LibraryProps> = (props: LibraryProps) => {
         isPaused,
         onResume,
         onPause,
-        onLoadFile,
         fileInputLabel,
         addSongToPlaylist,
     } = props;
@@ -32,7 +30,7 @@ export const Library: React.FC<LibraryProps> = (props: LibraryProps) => {
     return (
         <div className={classes.libraryContainer}>
             <div className={classes.libraryHeaderContainer}>
-                <UploadFileButton onLoadFile={onLoadFile} fileInputLabel={fileInputLabel} />
+                <UploadFileButton fileInputLabel={fileInputLabel} />
             </div>
             <div className={classes.libraryTableContainer}>
                 <LibraryTable

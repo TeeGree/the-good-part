@@ -10,8 +10,11 @@ import { Library } from './components/pages/Library';
 import { NavPanel } from './components/NavPanel';
 import { getFilenameFromPath } from './utility/FilePathUtils';
 import { SongInfo } from './models/SongInfo';
-import { defaultVolume } from './redux/state/volumeState';
+import { defaultVolume } from './redux/state/VolumeState';
 import { Playlists } from './components/pages/Playlists';
+import { useAppDispatch, useAppSelector } from './redux/Hooks';
+import { defaultAppSettings } from './redux/state/AppSettingsState';
+import { SET_APP_SETTINGS } from './redux/actions/AppSettingsActions';
 
 // Needed to polyfill dependencies that have been removed from Node.
 window.Buffer = Buffer;
@@ -20,6 +23,8 @@ window.process = process;
 Howler.volume(defaultVolume);
 
 const App: React.FC = () => {
+    const dispatch = useAppDispatch();
+
     const [playingSound, setPlayingSound] = useState<Howl>();
     const [playingSong, setPlayingSong] = useState<SongInfo>();
     const [playingPlaylistId, setPlayingPlaylistId] = useState<string | undefined>(undefined);
@@ -29,13 +34,29 @@ const App: React.FC = () => {
     const [currentPlaybackTime, setCurrentPlaybackTime] = useState<number | null>(null);
     const [totalDuration, setTotalDuration] = useState<number | null>(null);
     const [isPaused, setIsPaused] = useState<boolean>(false);
-    const [appSettings, setAppSettings] = useState<AppSettings>();
+
+    const appSettings = useAppSelector(
+        (state) => state.appSettings?.appSettings ?? defaultAppSettings,
+    );
+
+    const setAppSettings = (value: AppSettings): void => {
+        dispatch({ type: SET_APP_SETTINGS, appSettings: value });
+    };
 
     useEffect(() => {
         window.electron.getSettings().then((settings) => {
             setAppSettings(settings);
         });
     }, []);
+
+    useEffect(() => {
+        if (playingSongId !== undefined) {
+            const index = appSettings.songs.findIndex((song) => song.id === playingSongId);
+            if (index >= 0 && playingSound != null) {
+                setHowlerEndCallback(playingSound, index);
+            }
+        }
+    }, [appSettings]);
 
     const clearPlayingSong = (): void => {
         setPlayingSound(undefined);
@@ -201,18 +222,6 @@ const App: React.FC = () => {
         return <></>;
     };
 
-    const uploadFile = async (file: File): Promise<void> => {
-        await window.electron.uploadFile(file.path);
-        const settings = await window.electron.getSettings();
-        setAppSettings(settings);
-        if (playingSongId !== undefined) {
-            const index = settings.songs.findIndex((song) => song.id === playingSongId);
-            if (index >= 0 && playingSound != null) {
-                setHowlerEndCallback(playingSound, index);
-            }
-        }
-    };
-
     const getSongsLength = (): number => {
         const songs =
             playingPlaylistId === undefined
@@ -258,12 +267,6 @@ const App: React.FC = () => {
         playSong(0, playlistId);
     };
 
-    const createPlaylist = async (name: string): Promise<void> => {
-        await window.electron.createPlaylist(name);
-        const settings = await window.electron.getSettings();
-        setAppSettings(settings);
-    };
-
     const addSongToPlaylist = async (playlistId: string, songId: string): Promise<void> => {
         await window.electron.addSongToPlaylist(playlistId, songId);
         const settings = await window.electron.getSettings();
@@ -287,7 +290,6 @@ const App: React.FC = () => {
                                     playingSongId={
                                         playingPlaylistId === undefined ? playingSongId : undefined
                                     }
-                                    onLoadFile={uploadFile}
                                     fileInputLabel="Choose music file to add to library"
                                     addSongToPlaylist={addSongToPlaylist}
                                 />
@@ -295,13 +297,7 @@ const App: React.FC = () => {
                         />
                         <Route
                             path="playlists"
-                            element={
-                                <Playlists
-                                    appSettings={appSettings}
-                                    playPlaylist={playPlaylist}
-                                    createPlaylist={createPlaylist}
-                                />
-                            }
+                            element={<Playlists playPlaylist={playPlaylist} />}
                         />
                         <Route path="*" element={<Navigate to="/" replace />} />
                     </Routes>
