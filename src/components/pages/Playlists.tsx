@@ -10,11 +10,8 @@ import {
     TextField,
 } from '@mui/material';
 import React, { useState } from 'react';
-import { AppSettings } from '../../models/AppSettings';
 import { Playlist } from '../../models/Playlist';
-import { SET_APP_SETTINGS } from '../../redux/actions/AppSettingsActions';
-import { useAppDispatch, useAppSelector } from '../../redux/Hooks';
-import { defaultAppSettings } from '../../redux/state/AppSettingsState';
+import { useAppSettingsDispatch, useAppSettingsSelector } from '../../redux/Hooks';
 import { modalStyle } from '../../utility/ModalStyle';
 import classes from './Playlists.module.scss';
 
@@ -23,24 +20,17 @@ interface PlaylistsProps {
 }
 
 export const Playlists: React.FC<PlaylistsProps> = (props: PlaylistsProps) => {
-    const dispatch = useAppDispatch();
+    const appSettingsDispatch = useAppSettingsDispatch();
+    const appSettings = useAppSettingsSelector();
     const { playPlaylist } = props;
 
     const [isCreatingPlaylist, setIsCreatingPlaylist] = useState(false);
     const [newPlaylistName, setNewPlaylistName] = useState<string>('');
 
-    const appSettings = useAppSelector(
-        (state) => state.appSettings?.appSettings ?? defaultAppSettings,
-    );
-
-    const setAppSettings = (value: AppSettings): void => {
-        dispatch({ type: SET_APP_SETTINGS, appSettings: value });
-    };
-
     const createPlaylist = async (name: string): Promise<void> => {
         await window.electron.createPlaylist(name);
         const settings = await window.electron.getSettings();
-        setAppSettings(settings);
+        appSettingsDispatch(settings);
     };
 
     const createCard = (

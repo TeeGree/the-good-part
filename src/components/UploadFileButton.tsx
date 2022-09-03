@@ -2,26 +2,20 @@ import React, { ChangeEvent } from 'react';
 import { Button, Tooltip } from '@mui/material';
 import { Upload } from '@mui/icons-material';
 import classes from './UploadFileButton.module.scss';
-import { useAppDispatch } from '../redux/Hooks';
-import { AppSettings } from '../models/AppSettings';
-import { SET_APP_SETTINGS } from '../redux/actions/AppSettingsActions';
+import { useAppSettingsDispatch } from '../redux/Hooks';
 
 interface UploadFileButtonProps {
     fileInputLabel: string;
 }
 
 export const UploadFileButton: React.FC<UploadFileButtonProps> = (props: UploadFileButtonProps) => {
-    const dispatch = useAppDispatch();
+    const appSettingsDispatch = useAppSettingsDispatch();
     const { fileInputLabel } = props;
-
-    const setAppSettings = (value: AppSettings): void => {
-        dispatch({ type: SET_APP_SETTINGS, appSettings: value });
-    };
 
     const uploadFile = async (file: File): Promise<void> => {
         await window.electron.uploadFile(file.path);
         const settings = await window.electron.getSettings();
-        setAppSettings(settings);
+        appSettingsDispatch(settings);
     };
 
     const openFile = (event: ChangeEvent<HTMLInputElement>): void => {

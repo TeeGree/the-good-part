@@ -6,23 +6,21 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import classes from './LibraryTable.module.scss';
-import { AppSettings } from '../models/AppSettings';
 import { LibraryTableRow } from './LibraryTableRow';
 import { Playlist } from '../models/Playlist';
+import { useAppSettingsSelector } from '../redux/Hooks';
 
 interface LibraryTableProps {
-    appSettings: AppSettings | undefined;
     playSong: (index: number) => void;
     playingSongId: string | undefined;
     isPaused: boolean;
     onPause: () => void;
     onResume: () => void;
-    addSongToPlaylist: (playlistId: string, songId: string) => Promise<void>;
 }
 
 export const LibraryTable: React.FC<LibraryTableProps> = (props: LibraryTableProps) => {
-    const { appSettings, playingSongId, playSong, isPaused, onResume, onPause, addSongToPlaylist } =
-        props;
+    const appSettings = useAppSettingsSelector();
+    const { playingSongId, playSong, isPaused, onResume, onPause } = props;
 
     const getPlaylists = (): Playlist[] => {
         return appSettings?.playlists ?? [];
@@ -41,7 +39,6 @@ export const LibraryTable: React.FC<LibraryTableProps> = (props: LibraryTablePro
                     onResume={onResume}
                     songIndex={i}
                     playlists={getPlaylists()}
-                    addSongToPlaylist={addSongToPlaylist}
                 />
             );
         });

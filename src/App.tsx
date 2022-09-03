@@ -12,9 +12,7 @@ import { getFilenameFromPath } from './utility/FilePathUtils';
 import { SongInfo } from './models/SongInfo';
 import { defaultVolume } from './redux/state/VolumeState';
 import { Playlists } from './components/pages/Playlists';
-import { useAppDispatch, useAppSelector } from './redux/Hooks';
-import { defaultAppSettings } from './redux/state/AppSettingsState';
-import { SET_APP_SETTINGS } from './redux/actions/AppSettingsActions';
+import { useAppSettingsDispatch, useAppSettingsSelector } from './redux/Hooks';
 
 // Needed to polyfill dependencies that have been removed from Node.
 window.Buffer = Buffer;
@@ -23,7 +21,8 @@ window.process = process;
 Howler.volume(defaultVolume);
 
 const App: React.FC = () => {
-    const dispatch = useAppDispatch();
+    const appSettingsDispatch = useAppSettingsDispatch();
+    const appSettings = useAppSettingsSelector();
 
     const [playingSound, setPlayingSound] = useState<Howl>();
     const [playingSong, setPlayingSong] = useState<SongInfo>();
@@ -35,12 +34,8 @@ const App: React.FC = () => {
     const [totalDuration, setTotalDuration] = useState<number | null>(null);
     const [isPaused, setIsPaused] = useState<boolean>(false);
 
-    const appSettings = useAppSelector(
-        (state) => state.appSettings?.appSettings ?? defaultAppSettings,
-    );
-
     const setAppSettings = (value: AppSettings): void => {
-        dispatch({ type: SET_APP_SETTINGS, appSettings: value });
+        appSettingsDispatch(value);
     };
 
     useEffect(() => {
@@ -267,12 +262,6 @@ const App: React.FC = () => {
         playSong(0, playlistId);
     };
 
-    const addSongToPlaylist = async (playlistId: string, songId: string): Promise<void> => {
-        await window.electron.addSongToPlaylist(playlistId, songId);
-        const settings = await window.electron.getSettings();
-        setAppSettings(settings);
-    };
-
     return (
         <div className={classes.app}>
             <div className={classes.appContainer}>
@@ -282,7 +271,6 @@ const App: React.FC = () => {
                             path="/"
                             element={
                                 <Library
-                                    appSettings={appSettings}
                                     playSong={playSong}
                                     onPause={pausePlayingSong}
                                     onResume={resumePlayingSong}
@@ -291,7 +279,6 @@ const App: React.FC = () => {
                                         playingPlaylistId === undefined ? playingSongId : undefined
                                     }
                                     fileInputLabel="Choose music file to add to library"
-                                    addSongToPlaylist={addSongToPlaylist}
                                 />
                             }
                         />

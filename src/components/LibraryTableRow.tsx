@@ -18,6 +18,7 @@ import { TooltipOnOverflow } from './TooltipOnOverflow';
 import { getFilenameWithoutExtension } from '../utility/FilePathUtils';
 import { modalStyle } from '../utility/ModalStyle';
 import { Playlist } from '../models/Playlist';
+import { useAppSettingsDispatch } from '../redux/Hooks';
 
 interface LibraryTableRowProps {
     song: SongInfo;
@@ -28,21 +29,12 @@ interface LibraryTableRowProps {
     onResume: () => void;
     isPaused: boolean;
     playlists: Playlist[];
-    addSongToPlaylist: (playlistId: string, songId: string) => Promise<void>;
 }
 
 export const LibraryTableRow: React.FC<LibraryTableRowProps> = (props: LibraryTableRowProps) => {
-    const {
-        song,
-        songIndex,
-        playingSongId,
-        playSong,
-        onPause,
-        onResume,
-        isPaused,
-        playlists,
-        addSongToPlaylist,
-    } = props;
+    const appSettingsDispatch = useAppSettingsDispatch();
+    const { song, songIndex, playingSongId, playSong, onPause, onResume, isPaused, playlists } =
+        props;
 
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const [isAddingToPlaylist, setIsAddingToPlaylist] = useState(false);
@@ -72,6 +64,12 @@ export const LibraryTableRow: React.FC<LibraryTableRowProps> = (props: LibraryTa
         handleClose();
         setIsAddingToPlaylist(false);
         setPlaylistIdToAddSongTo(getDefaultPlaylistId());
+    };
+
+    const addSongToPlaylist = async (playlistId: string, songId: string): Promise<void> => {
+        await window.electron.addSongToPlaylist(playlistId, songId);
+        const settings = await window.electron.getSettings();
+        appSettingsDispatch(settings);
     };
 
     const addSongForRowToPlaylist = async () => {
