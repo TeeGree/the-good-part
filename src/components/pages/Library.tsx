@@ -13,6 +13,7 @@ interface LibraryProps {
     onResume: () => void;
     onLoadFile: (file: File) => Promise<void>;
     fileInputLabel: string;
+    addSongToPlaylist: (playlistId: string, songId: string) => Promise<void>;
 }
 
 export const Library: React.FC<LibraryProps> = (props: LibraryProps) => {
@@ -25,6 +26,7 @@ export const Library: React.FC<LibraryProps> = (props: LibraryProps) => {
         onPause,
         onLoadFile,
         fileInputLabel,
+        addSongToPlaylist,
     } = props;
 
     return (
@@ -40,6 +42,7 @@ export const Library: React.FC<LibraryProps> = (props: LibraryProps) => {
                     onPause={onPause}
                     onResume={onResume}
                     playingSongId={playingSongId}
+                    addSongToPlaylist={addSongToPlaylist}
                 />
             </div>
         </div>

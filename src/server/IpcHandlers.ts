@@ -25,6 +25,10 @@ export const setupIpcHandlers = (): void => {
     ipcMain.handle('create-playlist', async (_, name: string) =>
         addPlaylistToAppSettingsFile(name).catch(() => 'Error creating playlist'),
     );
+
+    ipcMain.handle('add-song-to-playlist', async (_, playlistId: string, songId: string) =>
+        addSongToPlaylist(playlistId, songId).catch(() => 'Error adding song to playlist'),
+    );
 };
 
 const getParsedSettings = async (): Promise<AppSettings> => {
@@ -137,5 +141,20 @@ const addPlaylistToAppSettingsFile = async (name: string): Promise<void> => {
         color: '#483d8b',
         songIds: [],
     });
+    await writeSettingsToFile(settings);
+};
+
+const addSongToPlaylist = async (playlistId: string, songId: string): Promise<void> => {
+    const settings = await getSettingsFromFile();
+    const playlistForSong = settings.playlists.find((playlist: Playlist) => {
+        return playlist.id === playlistId;
+    });
+
+    if (playlistForSong === undefined) {
+        throw Error(`Invalid playlist ID: ${playlistId}`);
+    }
+
+    playlistForSong.songIds.push(songId);
+
     await writeSettingsToFile(settings);
 };

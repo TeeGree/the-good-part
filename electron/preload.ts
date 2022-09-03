@@ -8,4 +8,6 @@ contextBridge.exposeInMainWorld('electron', {
     getSettings: (): Promise<AppSettings> => ipcRenderer.invoke('get-settings'),
     uploadFile: (filepath: string): Promise<void> => ipcRenderer.invoke('upload-file', filepath),
     createPlaylist: (name: string): Promise<void> => ipcRenderer.invoke('create-playlist', name),
+    addSongToPlaylist: (playlistId: string, songId: string): Promise<void> =>
+        ipcRenderer.invoke('add-song-to-playlist', playlistId, songId),
 });

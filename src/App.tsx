@@ -264,6 +264,12 @@ const App: React.FC = () => {
         setAppSettings(settings);
     };
 
+    const addSongToPlaylist = async (playlistId: string, songId: string): Promise<void> => {
+        await window.electron.addSongToPlaylist(playlistId, songId);
+        const settings = await window.electron.getSettings();
+        setAppSettings(settings);
+    };
+
     return (
         <div className={classes.app}>
             <div className={classes.appContainer}>
@@ -283,6 +289,7 @@ const App: React.FC = () => {
                                     }
                                     onLoadFile={uploadFile}
                                     fileInputLabel="Choose music file to add to library"
+                                    addSongToPlaylist={addSongToPlaylist}
                                 />
                             }
                         />

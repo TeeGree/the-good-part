@@ -6,6 +6,7 @@ export interface IElectronAPI {
     getSettings: () => Promise<AppSettings>;
     uploadFile: (filepath: string) => Promise<void>;
     createPlaylist: (name: string) => Promise<void>;
+    addSongToPlaylist: (playlistId: string, songId: string) => Promise<void>;
 }
 
 declare global {
