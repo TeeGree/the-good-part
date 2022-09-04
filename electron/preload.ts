@@ -10,4 +10,5 @@ contextBridge.exposeInMainWorld('electron', {
     createPlaylist: (name: string): Promise<void> => ipcRenderer.invoke('create-playlist', name),
     addSongToPlaylist: (playlistId: string, songId: string): Promise<void> =>
         ipcRenderer.invoke('add-song-to-playlist', playlistId, songId),
+    deleteSong: (songId: string): Promise<void> => ipcRenderer.invoke('delete-song', songId),
 });

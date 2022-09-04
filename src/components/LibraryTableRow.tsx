@@ -112,6 +112,12 @@ export const LibraryTableRow: React.FC<LibraryTableRowProps> = (props: LibraryTa
         return getFilenameWithoutExtension(filename);
     };
 
+    const deleteSong = async (): Promise<void> => {
+        await window.electron.deleteSong(song.id);
+        const settings = await window.electron.getSettings();
+        appSettingsDispatch(settings);
+    };
+
     const getPlaylistMenuItems = (): JSX.Element[] => {
         return playlists.map((playlist: Playlist) => (
             <MenuItem key={playlist.id} value={playlist.id}>
@@ -172,6 +178,7 @@ export const LibraryTableRow: React.FC<LibraryTableRowProps> = (props: LibraryTa
                     >
                         Add to playlist
                     </MenuItem>
+                    <MenuItem onClick={deleteSong}>Delete</MenuItem>
                 </Menu>
             </TableCell>
             <Modal open={isAddingToPlaylist}>

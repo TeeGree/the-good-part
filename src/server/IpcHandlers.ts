@@ -29,6 +29,10 @@ export const setupIpcHandlers = (): void => {
     ipcMain.handle('add-song-to-playlist', async (_, playlistId: string, songId: string) =>
         addSongToPlaylist(playlistId, songId).catch(() => 'Error adding song to playlist'),
     );
+
+    ipcMain.handle('delete-song', async (_, songId: string) =>
+        deleteSong(songId).catch(() => 'Error deleting song'),
+    );
 };
 
 const getParsedSettings = async (): Promise<AppSettings> => {
@@ -155,6 +159,34 @@ const addSongToPlaylist = async (playlistId: string, songId: string): Promise<vo
     }
 
     playlistForSong.songIds.push(songId);
+
+    await writeSettingsToFile(settings);
+};
+
+const deleteSong = async (songId: string): Promise<void> => {
+    const settings = await getSettingsFromFile();
+
+    // Remove song ID from any playlist containing the song.
+    settings.playlists.forEach((playlist: Playlist) => {
+        let i = playlist.songIds.length - 1;
+        while (i >= 0) {
+            if (playlist.songIds[i] === songId) {
+                playlist.songIds.splice(i, 1);
+            }
+
+            i--;
+        }
+    });
+
+    // Remove from songs
+    let i = settings.songs.length - 1;
+    while (i >= 0) {
+        if (settings.songs[i].id === songId) {
+            settings.songs.splice(i, 1);
+        }
+
+        i--;
+    }
 
     await writeSettingsToFile(settings);
 };

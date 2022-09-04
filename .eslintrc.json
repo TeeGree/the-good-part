@@ -38,7 +38,8 @@
             {
                 "endOfLine": "auto"
             }
-        ]
+        ],
+        "no-plusplus": "off"
     },
     "ignorePatterns": ["build/*"],
     "settings": {
