@@ -5,6 +5,7 @@ import * as fs from 'fs';
 import { Playlist } from '../models/Playlist';
 import { getFilenameFromPath } from '../utility/FilePathUtils';
 import { app } from 'electron';
+import { v4 as uuidv4 } from 'uuid';
 
 const configFile = './the-good-part.settings.json';
 
@@ -163,6 +164,3 @@ export const deleteSong = async (songId: string): Promise<void> => {
 
     await writeSettingsToFile(settings);
 };
-function uuidv4(): string {
-    throw new Error('Function not implemented.');
-}
