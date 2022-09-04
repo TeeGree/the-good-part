@@ -1,18 +1,10 @@
-import { IAudioMetadata } from 'music-metadata';
-import { AppSettings } from './models/AppSettings';
+import { api } from './server/IpcHandlers';
 
-export interface IElectronAPI {
-    getFileMetadata: (filepath: string) => Promise<IAudioMetadata>;
-    getSettings: () => Promise<AppSettings>;
-    uploadFile: (filepath: string) => Promise<void>;
-    createPlaylist: (name: string) => Promise<void>;
-    addSongToPlaylist: (playlistId: string, songId: string) => Promise<void>;
-    deleteSong: (songId: string) => Promise<void>;
-}
+export type ElectronAPI = typeof api;
 
 declare global {
     interface Window {
-        electron: IElectronAPI;
+        electron: ElectronAPI;
     }
 }
 

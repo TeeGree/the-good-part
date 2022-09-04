@@ -1,192 +1,56 @@
-import { ipcMain, app } from 'electron';
-import * as fs from 'fs';
-import { parseFile, IAudioMetadata } from 'music-metadata';
-import { v4 as uuidv4 } from 'uuid';
-import { getFilenameFromPath } from '../utility/FilePathUtils';
-import { AppSettings, AppSettingsFromFile } from '../models/AppSettings';
-import { SongInfo, SongInfoFromSettings } from '../models/SongInfo';
-import { Playlist } from '../models/Playlist';
-
-const configFile = './the-good-part.settings.json';
+import { ipcMain, ipcRenderer } from 'electron';
+import { IAudioMetadata } from 'music-metadata';
+import { AppSettings } from '../models/AppSettings';
+import {
+    ADD_SONG_TO_PLAYLIST,
+    CREATE_PLAYLIST,
+    DELETE_SONG,
+    GET_FILE_METADATA,
+    GET_SETTINGS,
+    UPLOAD_FILE,
+} from './IpcFunctionChannels';
+import {
+    createPlaylist,
+    addSongToPlaylist,
+    uploadFile,
+    deleteSong,
+    getFileMetadata,
+    getSettings,
+} from './IpcFunctions';
 
 export const setupIpcHandlers = (): void => {
-    ipcMain.handle('get-settings', async (_) =>
-        getParsedSettings().catch(() => 'Error reading settings file'),
+    ipcMain.handle(GET_SETTINGS, async (_) =>
+        getSettings().catch(() => 'Error reading settings file'),
     );
 
-    ipcMain.handle('get-file-metadata', async (_, filepath: string) =>
+    ipcMain.handle(GET_FILE_METADATA, async (_, filepath: string) =>
         getFileMetadata(filepath).catch(() => 'Error getting file metadata'),
     );
 
-    ipcMain.handle('upload-file', async (_, filepath: string) =>
-        copyFileToPublicFolder(filepath).catch(() => 'Error uploading file'),
+    ipcMain.handle(UPLOAD_FILE, async (_, filepath: string) =>
+        uploadFile(filepath).catch(() => 'Error uploading file'),
     );
 
-    ipcMain.handle('create-playlist', async (_, name: string) =>
-        addPlaylistToAppSettingsFile(name).catch(() => 'Error creating playlist'),
+    ipcMain.handle(CREATE_PLAYLIST, async (_, name: string) =>
+        createPlaylist(name).catch(() => 'Error creating playlist'),
     );
 
-    ipcMain.handle('add-song-to-playlist', async (_, playlistId: string, songId: string) =>
+    ipcMain.handle(ADD_SONG_TO_PLAYLIST, async (_, playlistId: string, songId: string) =>
         addSongToPlaylist(playlistId, songId).catch(() => 'Error adding song to playlist'),
     );
 
-    ipcMain.handle('delete-song', async (_, songId: string) =>
+    ipcMain.handle(DELETE_SONG, async (_, songId: string) =>
         deleteSong(songId).catch(() => 'Error deleting song'),
     );
 };
 
-const getParsedSettings = async (): Promise<AppSettings> => {
-    const settings = await getSettingsFromFile();
-    return parseAppSettings(settings);
-};
-
-const getSettingsFromFile = async (): Promise<AppSettingsFromFile> => {
-    try {
-        const fileContent = await fs.promises.readFile(configFile, 'utf8');
-        const settings: AppSettingsFromFile = JSON.parse(fileContent);
-        return settings;
-    } catch {
-        const defaultSettings: AppSettingsFromFile = {
-            songs: [],
-            playlists: [],
-        };
-        await writeSettingsToFile(defaultSettings);
-        return defaultSettings;
-    }
-};
-
-const writeSettingsToFile = async (settings: AppSettingsFromFile): Promise<void> =>
-    fs.promises.writeFile(configFile, JSON.stringify(settings));
-
-interface SongMetadataMapping {
-    id: string;
-    metadata: IAudioMetadata;
-}
-
-const parseAppSettings = async (appSettings: AppSettingsFromFile): Promise<AppSettings> => {
-    const metadataMappings = await Promise.all(
-        appSettings.songs.map(async (song) => {
-            const metadata = await getFileMetadata(song.filename);
-            const metadataMapping: SongMetadataMapping = {
-                id: song.id,
-                metadata,
-            };
-            return metadataMapping;
-        }),
-    );
-
-    const metadataDict = new Map<string, IAudioMetadata>();
-
-    metadataMappings.forEach((metadataMapping) =>
-        metadataDict.set(metadataMapping.id, metadataMapping.metadata),
-    );
-
-    const songs: SongInfo[] = [];
-    const songMap = new Map<string, SongInfo>();
-    appSettings.songs.forEach((song: SongInfoFromSettings) => {
-        const parsedSong: SongInfo = {
-            id: song.id,
-            filename: song.filename,
-            fullPath: getFullPathWithPublicElectronFolder(song.filename),
-            metadata: metadataDict.get(song.id),
-        };
-
-        songs.push(parsedSong);
-
-        songMap.set(parsedSong.id, parsedSong);
-    });
-
-    const playlistMap = new Map<string, Playlist>();
-    appSettings.playlists.forEach((playlist: Playlist) => {
-        playlistMap.set(playlist.id, playlist);
-    });
-
-    const parsedSettings: AppSettings = {
-        songs,
-        songMap,
-        playlists: appSettings.playlists,
-        playlistMap,
-    };
-
-    return parsedSettings;
-};
-
-const getFileMetadata = async (filename: string): Promise<IAudioMetadata> => {
-    const fullpath = getFullPathWithPublicElectronFolder(filename);
-    return parseFile(fullpath);
-};
-
-const getFullPathWithPublicElectronFolder = (filename: string): string => {
-    const electronPath = app.getAppPath();
-    return `${electronPath}\\public\\${filename}`;
-};
-
-const copyFileToPublicFolder = async (filepath: string): Promise<void> => {
-    const filename = getFilenameFromPath(filepath);
-    const targetPath = getFullPathWithPublicElectronFolder(filename);
-    await fs.promises.copyFile(filepath, targetPath);
-    await addSongToAppSettingsFile(filename);
-};
-
-const addSongToAppSettingsFile = async (filename: string): Promise<void> => {
-    const settings = await getSettingsFromFile();
-    settings.songs.push({
-        id: uuidv4(),
-        filename,
-    });
-    await writeSettingsToFile(settings);
-};
-
-const addPlaylistToAppSettingsFile = async (name: string): Promise<void> => {
-    const settings = await getSettingsFromFile();
-    settings.playlists.push({
-        id: uuidv4(),
-        name,
-        color: '#483d8b',
-        songIds: [],
-    });
-    await writeSettingsToFile(settings);
-};
-
-const addSongToPlaylist = async (playlistId: string, songId: string): Promise<void> => {
-    const settings = await getSettingsFromFile();
-    const playlistForSong = settings.playlists.find((playlist: Playlist) => {
-        return playlist.id === playlistId;
-    });
-
-    if (playlistForSong === undefined) {
-        throw Error(`Invalid playlist ID: ${playlistId}`);
-    }
-
-    playlistForSong.songIds.push(songId);
-
-    await writeSettingsToFile(settings);
-};
-
-const deleteSong = async (songId: string): Promise<void> => {
-    const settings = await getSettingsFromFile();
-
-    // Remove song ID from any playlist containing the song.
-    settings.playlists.forEach((playlist: Playlist) => {
-        let i = playlist.songIds.length - 1;
-        while (i >= 0) {
-            if (playlist.songIds[i] === songId) {
-                playlist.songIds.splice(i, 1);
-            }
-
-            i--;
-        }
-    });
-
-    // Remove from songs
-    let i = settings.songs.length - 1;
-    while (i >= 0) {
-        if (settings.songs[i].id === songId) {
-            settings.songs.splice(i, 1);
-        }
-
-        i--;
-    }
-
-    await writeSettingsToFile(settings);
+export const api = {
+    getFileMetadata: (filepath: string): Promise<IAudioMetadata> =>
+        ipcRenderer.invoke(GET_FILE_METADATA, filepath),
+    getSettings: (): Promise<AppSettings> => ipcRenderer.invoke(GET_SETTINGS),
+    uploadFile: (filepath: string): Promise<void> => ipcRenderer.invoke(UPLOAD_FILE, filepath),
+    createPlaylist: (name: string): Promise<void> => ipcRenderer.invoke(CREATE_PLAYLIST, name),
+    addSongToPlaylist: (playlistId: string, songId: string): Promise<void> =>
+        ipcRenderer.invoke(ADD_SONG_TO_PLAYLIST, playlistId, songId),
+    deleteSong: (songId: string): Promise<void> => ipcRenderer.invoke(DELETE_SONG, songId),
 };

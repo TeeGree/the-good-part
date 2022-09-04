@@ -39,7 +39,8 @@
                 "endOfLine": "auto"
             }
         ],
-        "no-plusplus": "off"
+        "no-plusplus": "off",
+        "import/order": "off"
     },
     "ignorePatterns": ["build/*"],
     "settings": {
