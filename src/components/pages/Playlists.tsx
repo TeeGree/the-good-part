@@ -8,8 +8,9 @@ import {
     IconButton,
     Modal,
     TextField,
+    Tooltip,
 } from '@mui/material';
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Playlist } from '../../models/Playlist';
 import { useAppSettingsDispatch, useAppSettingsSelector } from '../../redux/Hooks';
 import { modalStyle } from '../../utility/ModalStyle';
@@ -20,6 +21,31 @@ interface PlaylistsProps {
 }
 
 export const Playlists: React.FC<PlaylistsProps> = (props: PlaylistsProps) => {
+    const elementRef = useRef<HTMLInputElement | null>(null);
+    const [numTilesPerRow, setNumTilesPerRow] = useState(3);
+
+    const getNumTilesPerRow = (): number => {
+        const tileWidth = 217;
+        const scrollWidth = elementRef?.current?.scrollWidth ?? 0;
+        return Math.floor(scrollWidth / tileWidth);
+    };
+
+    useEffect(() => {
+        const handleResize = (): void => {
+            setNumTilesPerRow(getNumTilesPerRow());
+        };
+
+        if (elementRef.current != null) {
+            setNumTilesPerRow(getNumTilesPerRow());
+        }
+
+        window.addEventListener('resize', handleResize);
+
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        };
+    }, [elementRef]);
+
     const appSettingsDispatch = useAppSettingsDispatch();
     const appSettings = useAppSettingsSelector();
     const { playPlaylist } = props;
@@ -33,32 +59,24 @@ export const Playlists: React.FC<PlaylistsProps> = (props: PlaylistsProps) => {
         appSettingsDispatch(settings);
     };
 
-    const createCard = (
-        label: string,
-        color: string,
-        onClick: () => void,
-        muiIcon: React.ReactNode | null,
-        key?: string,
-    ) => {
-        const iconButton =
-            muiIcon === null ? (
-                <></>
-            ) : (
-                <IconButton sx={{ color: '#ffffff' }} onClick={onClick}>
-                    {muiIcon}
+    const createPlaylistCard = (playlist: Playlist) => {
+        const playButton =
+            playlist.songIds.length > 0 ? (
+                <IconButton sx={{ color: '#ffffff' }} onClick={() => playPlaylist(playlist.id)}>
+                    <PlayArrow />
                 </IconButton>
-            );
+            ) : null;
         return (
             <Card
-                key={key}
+                key={playlist.id}
                 className={classes.playlist}
                 sx={{
-                    backgroundColor: color,
+                    backgroundColor: playlist.color,
                     color: '#ffffff',
                 }}
             >
-                <CardContent>{label}</CardContent>
-                <CardActions>{iconButton}</CardActions>
+                <CardContent>{playlist.name}</CardContent>
+                <CardActions>{playButton}</CardActions>
             </Card>
         );
     };
@@ -68,10 +86,22 @@ export const Playlists: React.FC<PlaylistsProps> = (props: PlaylistsProps) => {
             return <></>;
         }
 
-        return appSettings.playlists.map<JSX.Element>((item: Playlist) => {
-            const icon = item.songIds.length > 0 ? <PlayArrow /> : null;
-            return createCard(item.name, item.color, () => playPlaylist(item.id), icon, item.id);
-        });
+        const playlists = appSettings.playlists;
+        const playlistCount = playlists.length;
+        const rowCount = Math.ceil(playlistCount / numTilesPerRow);
+        const results: JSX.Element[] = [];
+
+        for (let i = 0; i < rowCount; i++) {
+            const startingIndex = i * numTilesPerRow;
+            const playlistsSubset = playlists.slice(startingIndex, startingIndex + numTilesPerRow);
+            results.push(
+                <div key={`playlistRow${i}`} className={classes.playlistRow}>
+                    {playlistsSubset.map(createPlaylistCard)}
+                </div>,
+            );
+        }
+
+        return results;
     };
 
     const closeCreatePlaylistModal = (): void => {
@@ -93,35 +123,43 @@ export const Playlists: React.FC<PlaylistsProps> = (props: PlaylistsProps) => {
     const isCreatePlaylistDisabled = newPlaylistName === undefined || newPlaylistName === '';
 
     return (
-        <div className={classes.playlistsContainer}>
-            {getPlaylistCards()}
-            {createCard(
-                'Create new playlist',
-                '#483d8b',
-                () => setIsCreatingPlaylist(true),
-                <Add />,
-            )}
-            <Modal open={isCreatingPlaylist}>
-                <Box sx={modalStyle}>
-                    <h2>Create new playlist</h2>
-                    <TextField
-                        id="new-playlist-name"
-                        label="Playlist name"
-                        variant="standard"
-                        value={newPlaylistName}
-                        onChange={onNewPlaylistNameChange}
-                    />
-                    <div className={classes.modalButtonContainer}>
-                        <Button
-                            disabled={isCreatePlaylistDisabled}
-                            onClick={createPlaylistAndCloseModal}
-                        >
-                            Create
-                        </Button>
-                        <Button onClick={closeCreatePlaylistModal}>Cancel</Button>
-                    </div>
-                </Box>
-            </Modal>
+        <div className={classes.playlistsContentContainer} ref={elementRef}>
+            <div className={classes.playlistHeaderContainer}>
+                <Tooltip title="Create Playlist">
+                    <Button
+                        sx={{ color: '#ffffff', margin: '5px', backgroundColor: '#36a5ef' }}
+                        component="span"
+                        variant="contained"
+                        onClick={() => setIsCreatingPlaylist(true)}
+                    >
+                        <Add />
+                    </Button>
+                </Tooltip>
+            </div>
+            <div className={classes.playlistsContainer}>
+                {getPlaylistCards()}
+                <Modal open={isCreatingPlaylist}>
+                    <Box sx={modalStyle}>
+                        <h2>Create new playlist</h2>
+                        <TextField
+                            id="new-playlist-name"
+                            label="Playlist name"
+                            variant="standard"
+                            value={newPlaylistName}
+                            onChange={onNewPlaylistNameChange}
+                        />
+                        <div className={classes.modalButtonContainer}>
+                            <Button
+                                disabled={isCreatePlaylistDisabled}
+                                onClick={createPlaylistAndCloseModal}
+                            >
+                                Create
+                            </Button>
+                            <Button onClick={closeCreatePlaylistModal}>Cancel</Button>
+                        </div>
+                    </Box>
+                </Modal>
+            </div>
         </div>
     );
 };

@@ -40,7 +40,8 @@
             }
         ],
         "no-plusplus": "off",
-        "import/order": "off"
+        "import/order": "off",
+        "prefer-destructuring": "off"
     },
     "ignorePatterns": ["build/*"],
     "settings": {
