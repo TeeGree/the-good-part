@@ -4,6 +4,7 @@ import { AppSettings } from '../models/AppSettings';
 import {
     ADD_SONG_TO_PLAYLIST,
     CREATE_PLAYLIST,
+    DELETE_PLAYLIST,
     DELETE_SONG,
     GET_FILE_METADATA,
     GET_SETTINGS,
@@ -16,6 +17,7 @@ import {
     deleteSong,
     getFileMetadata,
     getSettings,
+    deletePlaylist,
 } from './IpcFunctions';
 
 export const setupIpcHandlers = (): void => {
@@ -42,6 +44,10 @@ export const setupIpcHandlers = (): void => {
     ipcMain.handle(DELETE_SONG, async (_, songId: string) =>
         deleteSong(songId).catch(() => 'Error deleting song'),
     );
+
+    ipcMain.handle(DELETE_PLAYLIST, async (_, playlistId: string) =>
+        deletePlaylist(playlistId).catch(() => 'Error deleting playlist'),
+    );
 };
 
 export const api = {
@@ -53,4 +59,6 @@ export const api = {
     addSongToPlaylist: (playlistId: string, songId: string): Promise<void> =>
         ipcRenderer.invoke(ADD_SONG_TO_PLAYLIST, playlistId, songId),
     deleteSong: (songId: string): Promise<void> => ipcRenderer.invoke(DELETE_SONG, songId),
+    deletePlaylist: (playlistId: string): Promise<void> =>
+        ipcRenderer.invoke(DELETE_PLAYLIST, playlistId),
 };

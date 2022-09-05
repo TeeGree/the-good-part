@@ -164,3 +164,18 @@ export const deleteSong = async (songId: string): Promise<void> => {
 
     await writeSettingsToFile(settings);
 };
+
+export const deletePlaylist = async (playlistId: string): Promise<void> => {
+    const settings = await getSettingsFromFile();
+
+    let i = settings.playlists.length - 1;
+    while (i >= 0) {
+        if (settings.playlists[i].id === playlistId) {
+            settings.playlists.splice(i, 1);
+        }
+
+        i--;
+    }
+
+    await writeSettingsToFile(settings);
+};

@@ -9,3 +9,5 @@ export const CREATE_PLAYLIST = 'create-playlist';
 export const ADD_SONG_TO_PLAYLIST = 'add-song-to-playlist';
 
 export const DELETE_SONG = 'delete-song';
+
+export const DELETE_PLAYLIST = 'delete-playlist';

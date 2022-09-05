@@ -1,4 +1,4 @@
-import { Add, PlayArrow } from '@mui/icons-material';
+import { Add, Delete, PlayArrow } from '@mui/icons-material';
 import {
     Box,
     Button,
@@ -59,6 +59,12 @@ export const Playlists: React.FC<PlaylistsProps> = (props: PlaylistsProps) => {
         appSettingsDispatch(settings);
     };
 
+    const deletePlaylist = async (playlistId: string): Promise<void> => {
+        await window.electron.deletePlaylist(playlistId);
+        const settings = await window.electron.getSettings();
+        appSettingsDispatch(settings);
+    };
+
     const createPlaylistCard = (playlist: Playlist) => {
         const playButton =
             playlist.songIds.length > 0 ? (
@@ -76,7 +82,17 @@ export const Playlists: React.FC<PlaylistsProps> = (props: PlaylistsProps) => {
                 }}
             >
                 <CardContent>{playlist.name}</CardContent>
-                <CardActions>{playButton}</CardActions>
+                <CardActions>
+                    {playButton}
+                    <Tooltip title="Delete">
+                        <IconButton
+                            sx={{ color: '#ffffff' }}
+                            onClick={() => deletePlaylist(playlist.id)}
+                        >
+                            <Delete />
+                        </IconButton>
+                    </Tooltip>
+                </CardActions>
             </Card>
         );
     };
