@@ -23,6 +23,7 @@ interface PlaylistsProps {
 export const Playlists: React.FC<PlaylistsProps> = (props: PlaylistsProps) => {
     const elementRef = useRef<HTMLInputElement | null>(null);
     const [numTilesPerRow, setNumTilesPerRow] = useState(3);
+    const [playlistBeingDeleted, setPlaylistBeingDeleted] = useState('');
 
     const getNumTilesPerRow = (): number => {
         const tileWidth = 217;
@@ -87,7 +88,7 @@ export const Playlists: React.FC<PlaylistsProps> = (props: PlaylistsProps) => {
                     <Tooltip title="Delete">
                         <IconButton
                             sx={{ color: '#ffffff' }}
-                            onClick={() => deletePlaylist(playlist.id)}
+                            onClick={() => setPlaylistBeingDeleted(playlist.id)}
                         >
                             <Delete />
                         </IconButton>
@@ -136,6 +137,15 @@ export const Playlists: React.FC<PlaylistsProps> = (props: PlaylistsProps) => {
         setNewPlaylistName(event.target.value);
     };
 
+    const getPlaylistName = (playlistId: string): string => {
+        return appSettings.playlistMap.get(playlistId)?.name ?? '';
+    };
+
+    const confirmDeletePlaylist = (): void => {
+        deletePlaylist(playlistBeingDeleted);
+        setPlaylistBeingDeleted('');
+    };
+
     const isCreatePlaylistDisabled = newPlaylistName === undefined || newPlaylistName === '';
 
     return (
@@ -172,6 +182,17 @@ export const Playlists: React.FC<PlaylistsProps> = (props: PlaylistsProps) => {
                                 Create
                             </Button>
                             <Button onClick={closeCreatePlaylistModal}>Cancel</Button>
+                        </div>
+                    </Box>
+                </Modal>
+                <Modal open={playlistBeingDeleted !== ''}>
+                    <Box sx={modalStyle}>
+                        <h2>{`Are you sure you want to delete the "${getPlaylistName(
+                            playlistBeingDeleted,
+                        )}" playlist?`}</h2>
+                        <div className={classes.modalButtonContainer}>
+                            <Button onClick={confirmDeletePlaylist}>Delete</Button>
+                            <Button onClick={() => setPlaylistBeingDeleted('')}>Cancel</Button>
                         </div>
                     </Box>
                 </Modal>
