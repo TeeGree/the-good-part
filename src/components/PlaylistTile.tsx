@@ -8,6 +8,7 @@ import {
     IconButton,
     Modal,
     Tooltip,
+    Typography,
 } from '@mui/material';
 import React, { useState } from 'react';
 import { Playlist } from '../models/Playlist';
@@ -37,6 +38,18 @@ export const PlaylistTile: React.FC<PlaylistTileProps> = (props: PlaylistTilePro
         setIsDeleting(false);
     };
 
+    const getSongCountText = (): string => {
+        const count = playlist.songIds.length;
+
+        const text = `${playlist.songIds.length} song`;
+
+        if (count === 1) {
+            return text;
+        }
+
+        return `${text}s`;
+    };
+
     const playButton =
         playlist.songIds.length > 0 ? (
             <IconButton sx={{ color: '#ffffff' }} onClick={() => playPlaylist(playlist.id)}>
@@ -52,7 +65,12 @@ export const PlaylistTile: React.FC<PlaylistTileProps> = (props: PlaylistTilePro
                 color: '#ffffff',
             }}
         >
-            <CardContent>{playlist.name}</CardContent>
+            <CardContent>
+                {playlist.name}
+                <Typography variant="body2" color="text.secondary">
+                    {getSongCountText()}
+                </Typography>
+            </CardContent>
             <CardActions>
                 {playButton}
                 <Tooltip title="Delete">
