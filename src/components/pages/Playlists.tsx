@@ -1,19 +1,10 @@
-import { Add, Delete, PlayArrow } from '@mui/icons-material';
-import {
-    Box,
-    Button,
-    Card,
-    CardActions,
-    CardContent,
-    IconButton,
-    Modal,
-    TextField,
-    Tooltip,
-} from '@mui/material';
+import { Add } from '@mui/icons-material';
+import { Box, Button, Modal, TextField, Tooltip } from '@mui/material';
 import React, { useEffect, useRef, useState } from 'react';
 import { Playlist } from '../../models/Playlist';
 import { useAppSettingsDispatch, useAppSettingsSelector } from '../../redux/Hooks';
 import { modalStyle } from '../../utility/ModalStyle';
+import { PlaylistTile } from '../PlaylistTile';
 import classes from './Playlists.module.scss';
 
 interface PlaylistsProps {
@@ -23,7 +14,6 @@ interface PlaylistsProps {
 export const Playlists: React.FC<PlaylistsProps> = (props: PlaylistsProps) => {
     const elementRef = useRef<HTMLInputElement | null>(null);
     const [numTilesPerRow, setNumTilesPerRow] = useState(3);
-    const [playlistBeingDeleted, setPlaylistBeingDeleted] = useState('');
 
     const getNumTilesPerRow = (): number => {
         const tileWidth = 217;
@@ -60,44 +50,6 @@ export const Playlists: React.FC<PlaylistsProps> = (props: PlaylistsProps) => {
         appSettingsDispatch(settings);
     };
 
-    const deletePlaylist = async (playlistId: string): Promise<void> => {
-        await window.electron.deletePlaylist(playlistId);
-        const settings = await window.electron.getSettings();
-        appSettingsDispatch(settings);
-    };
-
-    const createPlaylistCard = (playlist: Playlist) => {
-        const playButton =
-            playlist.songIds.length > 0 ? (
-                <IconButton sx={{ color: '#ffffff' }} onClick={() => playPlaylist(playlist.id)}>
-                    <PlayArrow />
-                </IconButton>
-            ) : null;
-        return (
-            <Card
-                key={playlist.id}
-                className={classes.playlist}
-                sx={{
-                    backgroundColor: playlist.color,
-                    color: '#ffffff',
-                }}
-            >
-                <CardContent>{playlist.name}</CardContent>
-                <CardActions>
-                    {playButton}
-                    <Tooltip title="Delete">
-                        <IconButton
-                            sx={{ color: '#ffffff' }}
-                            onClick={() => setPlaylistBeingDeleted(playlist.id)}
-                        >
-                            <Delete />
-                        </IconButton>
-                    </Tooltip>
-                </CardActions>
-            </Card>
-        );
-    };
-
     const getPlaylistCards = (): JSX.Element | JSX.Element[] => {
         if (appSettings === undefined) {
             return <></>;
@@ -113,7 +65,15 @@ export const Playlists: React.FC<PlaylistsProps> = (props: PlaylistsProps) => {
             const playlistsSubset = playlists.slice(startingIndex, startingIndex + numTilesPerRow);
             results.push(
                 <div key={`playlistRow${i}`} className={classes.playlistRow}>
-                    {playlistsSubset.map(createPlaylistCard)}
+                    {playlistsSubset.map((playlist: Playlist) => {
+                        return (
+                            <PlaylistTile
+                                key={playlist.id}
+                                playPlaylist={playPlaylist}
+                                playlist={playlist}
+                            />
+                        );
+                    })}
                 </div>,
             );
         }
@@ -135,15 +95,6 @@ export const Playlists: React.FC<PlaylistsProps> = (props: PlaylistsProps) => {
         event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
     ): void => {
         setNewPlaylistName(event.target.value);
-    };
-
-    const getPlaylistName = (playlistId: string): string => {
-        return appSettings.playlistMap.get(playlistId)?.name ?? '';
-    };
-
-    const confirmDeletePlaylist = (): void => {
-        deletePlaylist(playlistBeingDeleted);
-        setPlaylistBeingDeleted('');
     };
 
     const isCreatePlaylistDisabled = newPlaylistName === undefined || newPlaylistName === '';
@@ -182,17 +133,6 @@ export const Playlists: React.FC<PlaylistsProps> = (props: PlaylistsProps) => {
                                 Create
                             </Button>
                             <Button onClick={closeCreatePlaylistModal}>Cancel</Button>
-                        </div>
-                    </Box>
-                </Modal>
-                <Modal open={playlistBeingDeleted !== ''}>
-                    <Box sx={modalStyle}>
-                        <h2>{`Are you sure you want to delete the "${getPlaylistName(
-                            playlistBeingDeleted,
-                        )}" playlist?`}</h2>
-                        <div className={classes.modalButtonContainer}>
-                            <Button onClick={confirmDeletePlaylist}>Delete</Button>
-                            <Button onClick={() => setPlaylistBeingDeleted('')}>Cancel</Button>
                         </div>
                     </Box>
                 </Modal>
