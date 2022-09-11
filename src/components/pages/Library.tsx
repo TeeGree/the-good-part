@@ -1,5 +1,5 @@
 import React from 'react';
-import { useAppSettingsSelector } from '../../redux/Hooks';
+import { useAppSettingsSelector } from '../../redux/hooks';
 import { SongTable } from '../SongTable';
 import { UploadFileButton } from '../UploadFileButton';
 import classes from './Library.module.scss';

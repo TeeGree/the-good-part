@@ -2,7 +2,7 @@ import { Add } from '@mui/icons-material';
 import { Box, Button, Modal, TextField, Tooltip } from '@mui/material';
 import React, { useEffect, useRef, useState } from 'react';
 import { Playlist } from '../../models/Playlist';
-import { useAppSettingsDispatch, useAppSettingsSelector } from '../../redux/Hooks';
+import { useAppSettingsDispatch, useAppSettingsSelector } from '../../redux/hooks';
 import { modalStyle } from '../../utility/ModalStyle';
 import { PlaylistTile } from '../PlaylistTile';
 import classes from './Playlists.module.scss';

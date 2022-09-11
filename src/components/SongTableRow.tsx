@@ -18,7 +18,7 @@ import { TooltipOnOverflow } from './TooltipOnOverflow';
 import { getFilenameWithoutExtension } from '../utility/FilePathUtils';
 import { modalStyle } from '../utility/ModalStyle';
 import { Playlist } from '../models/Playlist';
-import { useAppSettingsDispatch } from '../redux/Hooks';
+import { useAppSettingsDispatch } from '../redux/hooks';
 
 interface SongTableRowProps {
     song: SongInfo;

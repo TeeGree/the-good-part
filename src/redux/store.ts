@@ -1,6 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { appSettingsReducer } from './reducers/AppSettingsReducer';
-import { volumeReducer } from './reducers/VolumeReducer';
+import { volumeReducer } from './reducers/volumeReducer';
 
 export const store = configureStore({
     reducer: {

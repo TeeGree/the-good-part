@@ -13,7 +13,7 @@ import {
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Playlist } from '../models/Playlist';
-import { useAppSettingsDispatch } from '../redux/Hooks';
+import { useAppSettingsDispatch } from '../redux/hooks';
 import { modalStyle } from '../utility/ModalStyle';
 import classes from './pages/Playlists.module.scss';
 

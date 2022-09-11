@@ -1,7 +1,7 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import { SongInfo } from '../../models/SongInfo';
-import { useAppSettingsSelector } from '../../redux/Hooks';
+import { useAppSettingsSelector } from '../../redux/hooks';
 import { SongTable } from '../SongTable';
 import classes from './PlaylistSummary.module.scss';
 

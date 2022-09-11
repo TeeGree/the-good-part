@@ -4,7 +4,7 @@ import Slider from '@mui/material/Slider';
 import Tooltip from '@mui/material/Tooltip';
 import React, { useState } from 'react';
 import classes from './VolumeContainer.module.scss';
-import { useAppDispatch, useAppSelector } from '../redux/Hooks';
+import { useAppDispatch, useAppSelector } from '../redux/hooks';
 import { SET_VOLUME } from '../redux/actions/VolumeActions';
 
 const minAdjustment = 0.01;

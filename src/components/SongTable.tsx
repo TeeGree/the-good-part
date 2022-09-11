@@ -8,7 +8,7 @@ import TableRow from '@mui/material/TableRow';
 import classes from './SongTable.module.scss';
 import { SongTableRow } from './SongTableRow';
 import { Playlist } from '../models/Playlist';
-import { useAppSettingsSelector } from '../redux/Hooks';
+import { useAppSettingsSelector } from '../redux/hooks';
 import { SongInfo } from '../models/SongInfo';
 
 interface SongTableProps {

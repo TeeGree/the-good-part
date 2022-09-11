@@ -10,9 +10,9 @@ import { Library } from './components/pages/Library';
 import { NavPanel } from './components/NavPanel';
 import { getFilenameFromPath } from './utility/FilePathUtils';
 import { SongInfo } from './models/SongInfo';
-import { defaultVolume } from './redux/state/VolumeState';
+import { defaultVolume } from './redux/state/volumeState';
 import { Playlists } from './components/pages/Playlists';
-import { useAppSettingsDispatch, useAppSettingsSelector } from './redux/Hooks';
+import { useAppSettingsDispatch, useAppSettingsSelector } from './redux/hooks';
 import { PlaylistSummary } from './components/pages/PlaylistSummary';
 
 // Needed to polyfill dependencies that have been removed from Node.
