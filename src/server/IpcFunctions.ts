@@ -99,8 +99,6 @@ const getFullPathWithPublicElectronFolder = (filename: string): string => {
 export const uploadFile = async (filepath: string): Promise<void> => {
     const filename = getFilenameFromPath(filepath);
     const targetPath = getFullPathWithPublicElectronFolder(filename);
-    console.log(`initial path: ${filepath}`);
-    console.log(`target path: ${targetPath}`);
 
     await fs.promises.copyFile(filepath, targetPath);
 
