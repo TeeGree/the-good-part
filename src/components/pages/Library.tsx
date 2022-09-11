@@ -18,11 +18,11 @@ export const Library: React.FC<LibraryProps> = (props: LibraryProps) => {
     const { playingSongId, playSong, isPaused, onResume, onPause, fileInputLabel } = props;
 
     return (
-        <div className={classes.libraryContainer}>
-            <div className={classes.libraryHeaderContainer}>
+        <div className={classes.page}>
+            <div className={classes.HeaderContainer}>
                 <UploadFileButton fileInputLabel={fileInputLabel} />
             </div>
-            <div className={classes.libraryTableContainer}>
+            <div className={classes.songTableContainer}>
                 <SongTable
                     playSong={playSong}
                     isPaused={isPaused}

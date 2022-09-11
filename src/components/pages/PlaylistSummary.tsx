@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { SongInfo } from '../../models/SongInfo';
 import { useAppSettingsSelector } from '../../redux/Hooks';
 import { SongTable } from '../SongTable';
+import classes from './PlaylistSummary.module.scss';
 
 interface PlaylistSummaryProps {
     playSong: (index: number, playlistId: string) => void;
@@ -42,13 +43,18 @@ export const PlaylistSummary: React.FC<PlaylistSummaryProps> = (props: PlaylistS
     };
 
     return (
-        <SongTable
-            playSong={playSongInPlaylist}
-            isPaused={isPaused}
-            onPause={onPause}
-            onResume={onResume}
-            playingSongId={playingSongId}
-            songs={getSongs()}
-        />
+        <div className={classes.page}>
+            <div className={classes.HeaderContainer}>{playlist.name}</div>
+            <div className={classes.songTableContainer}>
+                <SongTable
+                    playSong={playSongInPlaylist}
+                    isPaused={isPaused}
+                    onPause={onPause}
+                    onResume={onResume}
+                    playingSongId={playingSongId}
+                    songs={getSongs()}
+                />
+            </div>
+        </div>
     );
 };

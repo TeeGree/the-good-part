@@ -1,0 +1,15 @@
+$headerHeight: 50px;
+
+.page {
+    width: 100%;
+}
+
+.songTableContainer {
+    width: 100%;
+    height: calc(100% - $headerHeight);
+}
+
+.HeaderContainer {
+    width: 100%;
+    height: $headerHeight;
+}
