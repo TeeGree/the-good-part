@@ -30,9 +30,10 @@ export const SongTable: React.FC<SongTableProps> = (props: SongTableProps) => {
 
     const getRowsForSongsInSettings = (): JSX.Element => {
         const songRows = songs.map((song, i) => {
+            const key = song + i.toString();
             return (
                 <SongTableRow
-                    key={song.id}
+                    key={key}
                     song={song}
                     playSong={playSong}
                     playingSongId={playingSongId}
