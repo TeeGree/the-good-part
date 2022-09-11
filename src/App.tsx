@@ -23,6 +23,7 @@ Howler.volume(defaultVolume);
 
 const App: React.FC = () => {
     const appSettingsDispatch = useAppSettingsDispatch();
+    // TODO: Fix issue with appSettings not refreshing from 0 to 1 song.
     const appSettings = useAppSettingsSelector();
 
     const [playingSound, setPlayingSound] = useState<Howl>();

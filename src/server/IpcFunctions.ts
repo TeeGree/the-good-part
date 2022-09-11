@@ -6,6 +6,7 @@ import { Playlist } from '../models/Playlist';
 import { getFilenameFromPath } from '../utility/FilePathUtils';
 import { app } from 'electron';
 import { v4 as uuidv4 } from 'uuid';
+import * as path from 'path';
 
 const configFile = './the-good-part.settings.json';
 
@@ -92,13 +93,17 @@ export const getFileMetadata = async (filename: string): Promise<IAudioMetadata>
 
 const getFullPathWithPublicElectronFolder = (filename: string): string => {
     const electronPath = app.getAppPath();
-    return `${electronPath}\\public\\${filename}`;
+    return path.join(electronPath, 'public', filename);
 };
 
 export const uploadFile = async (filepath: string): Promise<void> => {
     const filename = getFilenameFromPath(filepath);
     const targetPath = getFullPathWithPublicElectronFolder(filename);
+    console.log(`initial path: ${filepath}`);
+    console.log(`target path: ${targetPath}`);
+
     await fs.promises.copyFile(filepath, targetPath);
+
     await addSongToAppSettingsFile(filename);
 };
 
