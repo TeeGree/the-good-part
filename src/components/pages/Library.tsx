@@ -1,5 +1,6 @@
 import React from 'react';
-import { LibraryTable } from '../LibraryTable';
+import { useAppSettingsSelector } from '../../redux/Hooks';
+import { SongTable } from '../SongTable';
 import { UploadFileButton } from '../UploadFileButton';
 import classes from './Library.module.scss';
 
@@ -13,6 +14,7 @@ interface LibraryProps {
 }
 
 export const Library: React.FC<LibraryProps> = (props: LibraryProps) => {
+    const appSettings = useAppSettingsSelector();
     const { playingSongId, playSong, isPaused, onResume, onPause, fileInputLabel } = props;
 
     return (
@@ -21,12 +23,13 @@ export const Library: React.FC<LibraryProps> = (props: LibraryProps) => {
                 <UploadFileButton fileInputLabel={fileInputLabel} />
             </div>
             <div className={classes.libraryTableContainer}>
-                <LibraryTable
+                <SongTable
                     playSong={playSong}
                     isPaused={isPaused}
                     onPause={onPause}
                     onResume={onResume}
                     playingSongId={playingSongId}
+                    songs={appSettings.songs}
                 />
             </div>
         </div>

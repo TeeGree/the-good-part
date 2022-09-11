@@ -11,6 +11,7 @@ import {
     Typography,
 } from '@mui/material';
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Playlist } from '../models/Playlist';
 import { useAppSettingsDispatch } from '../redux/Hooks';
 import { modalStyle } from '../utility/ModalStyle';
@@ -50,35 +51,49 @@ export const PlaylistTile: React.FC<PlaylistTileProps> = (props: PlaylistTilePro
         return `${text}s`;
     };
 
+    const tryToDelete = (event: React.MouseEvent<HTMLButtonElement>) => {
+        event.preventDefault();
+        setIsDeleting(true);
+    };
+
+    const onPlay = (event: React.MouseEvent<HTMLButtonElement>) => {
+        event.preventDefault();
+        playPlaylist(playlist.id);
+    };
+
     const playButton =
         playlist.songIds.length > 0 ? (
-            <IconButton sx={{ color: '#ffffff' }} onClick={() => playPlaylist(playlist.id)}>
+            <IconButton sx={{ color: '#ffffff' }} onClick={onPlay}>
                 <PlayArrow />
             </IconButton>
         ) : null;
     return (
-        <Card
-            key={playlist.id}
-            className={classes.playlist}
-            sx={{
-                backgroundColor: playlist.color,
-                color: '#ffffff',
-            }}
-        >
-            <CardContent>
-                {playlist.name}
-                <Typography variant="body2" color="text.secondary">
-                    {getSongCountText()}
-                </Typography>
-            </CardContent>
-            <CardActions>
-                {playButton}
-                <Tooltip title="Delete">
-                    <IconButton sx={{ color: '#ffffff' }} onClick={() => setIsDeleting(true)}>
-                        <Delete />
-                    </IconButton>
-                </Tooltip>
-            </CardActions>
+        <>
+            <Link to={`/playlistSummary/${playlist.id}`}>
+                <Card
+                    key={playlist.id}
+                    className={classes.playlist}
+                    sx={{
+                        backgroundColor: playlist.color,
+                        color: '#ffffff',
+                    }}
+                >
+                    <CardContent>
+                        {playlist.name}
+                        <Typography variant="body2" color="text.secondary">
+                            {getSongCountText()}
+                        </Typography>
+                    </CardContent>
+                    <CardActions>
+                        {playButton}
+                        <Tooltip title="Delete">
+                            <IconButton sx={{ color: '#ffffff' }} onClick={tryToDelete}>
+                                <Delete />
+                            </IconButton>
+                        </Tooltip>
+                    </CardActions>
+                </Card>
+            </Link>
             <Modal open={isDeleting}>
                 <Box sx={modalStyle}>
                     <h2>{`Are you sure you want to delete the "${playlist.name}" playlist?`}</h2>
@@ -88,6 +103,6 @@ export const PlaylistTile: React.FC<PlaylistTileProps> = (props: PlaylistTilePro
                     </div>
                 </Box>
             </Modal>
-        </Card>
+        </>
     );
 };

@@ -13,14 +13,14 @@ import { MoreVert, Pause, PlayArrow } from '@mui/icons-material';
 import IconButton from '@mui/material/IconButton';
 import { SongInfo } from '../models/SongInfo';
 import { parseNumberAsMinutesText } from '../utility/StringUtils';
-import classes from './LibraryTable.module.scss';
+import classes from './SongTable.module.scss';
 import { TooltipOnOverflow } from './TooltipOnOverflow';
 import { getFilenameWithoutExtension } from '../utility/FilePathUtils';
 import { modalStyle } from '../utility/ModalStyle';
 import { Playlist } from '../models/Playlist';
 import { useAppSettingsDispatch } from '../redux/Hooks';
 
-interface LibraryTableRowProps {
+interface SongTableRowProps {
     song: SongInfo;
     songIndex: number;
     playingSongId: string | undefined;
@@ -31,7 +31,7 @@ interface LibraryTableRowProps {
     playlists: Playlist[];
 }
 
-export const LibraryTableRow: React.FC<LibraryTableRowProps> = (props: LibraryTableRowProps) => {
+export const SongTableRow: React.FC<SongTableRowProps> = (props: SongTableRowProps) => {
     const appSettingsDispatch = useAppSettingsDispatch();
     const { song, songIndex, playingSongId, playSong, onPause, onResume, isPaused, playlists } =
         props;

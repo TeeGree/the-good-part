@@ -5,31 +5,33 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import classes from './LibraryTable.module.scss';
-import { LibraryTableRow } from './LibraryTableRow';
+import classes from './SongTable.module.scss';
+import { SongTableRow } from './SongTableRow';
 import { Playlist } from '../models/Playlist';
 import { useAppSettingsSelector } from '../redux/Hooks';
+import { SongInfo } from '../models/SongInfo';
 
-interface LibraryTableProps {
+interface SongTableProps {
     playSong: (index: number) => void;
     playingSongId: string | undefined;
     isPaused: boolean;
     onPause: () => void;
     onResume: () => void;
+    songs: SongInfo[];
 }
 
-export const LibraryTable: React.FC<LibraryTableProps> = (props: LibraryTableProps) => {
+export const SongTable: React.FC<SongTableProps> = (props: SongTableProps) => {
     const appSettings = useAppSettingsSelector();
-    const { playingSongId, playSong, isPaused, onResume, onPause } = props;
+    const { playingSongId, playSong, isPaused, onResume, onPause, songs } = props;
 
     const getPlaylists = (): Playlist[] => {
         return appSettings?.playlists ?? [];
     };
 
     const getRowsForSongsInSettings = (): JSX.Element => {
-        const songRows = appSettings?.songs.map((song, i) => {
+        const songRows = songs.map((song, i) => {
             return (
-                <LibraryTableRow
+                <SongTableRow
                     key={song.id}
                     song={song}
                     playSong={playSong}
@@ -45,6 +47,10 @@ export const LibraryTable: React.FC<LibraryTableProps> = (props: LibraryTablePro
 
         return <TableBody>{songRows}</TableBody>;
     };
+
+    if (songs.length === 0) {
+        return <div>No songs available</div>;
+    }
 
     return (
         <TableContainer className={classes.tableContainer}>

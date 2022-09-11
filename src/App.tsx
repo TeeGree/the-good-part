@@ -13,6 +13,7 @@ import { SongInfo } from './models/SongInfo';
 import { defaultVolume } from './redux/state/VolumeState';
 import { Playlists } from './components/pages/Playlists';
 import { useAppSettingsDispatch, useAppSettingsSelector } from './redux/Hooks';
+import { PlaylistSummary } from './components/pages/PlaylistSummary';
 
 // Needed to polyfill dependencies that have been removed from Node.
 window.Buffer = Buffer;
@@ -283,8 +284,20 @@ const App: React.FC = () => {
                             }
                         />
                         <Route
-                            path="playlists"
+                            path="/playlists"
                             element={<Playlists playPlaylist={playPlaylist} />}
+                        />
+                        <Route
+                            path="/playlistSummary/:id"
+                            element={
+                                <PlaylistSummary
+                                    playSong={playSong}
+                                    onPause={pausePlayingSong}
+                                    onResume={resumePlayingSong}
+                                    isPaused={isPaused}
+                                    playingSongId={playingSongId}
+                                />
+                            }
                         />
                         <Route path="*" element={<Navigate to="/" replace />} />
                     </Routes>
