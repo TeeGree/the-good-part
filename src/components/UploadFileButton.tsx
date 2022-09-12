@@ -2,7 +2,7 @@ import React, { ChangeEvent, useState } from 'react';
 import { Button, Snackbar, Tooltip } from '@mui/material';
 import { Upload } from '@mui/icons-material';
 import classes from './UploadFileButton.module.scss';
-import { useAppSettingsDispatch, useAppSettingsSelector } from '../redux/hooks';
+import { useAppDispatch, useAppSettingsDispatch, useAppSettingsSelector } from '../redux/hooks';
 import MuiAlert, { AlertProps } from '@mui/material/Alert';
 import { SongInfo } from '../models/SongInfo';
 
@@ -16,7 +16,8 @@ const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(props,
 
 export const UploadFileButton: React.FC<UploadFileButtonProps> = (props: UploadFileButtonProps) => {
     const appSettings = useAppSettingsSelector();
-    const appSettingsDispatch = useAppSettingsDispatch();
+    const dispatch = useAppDispatch();
+    const appSettingsDispatch = useAppSettingsDispatch(dispatch);
     const { fileInputLabel } = props;
     const [errorMessage, setErrorMessage] = useState('');
 

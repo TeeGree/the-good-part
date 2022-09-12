@@ -13,7 +13,7 @@ import {
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Playlist } from '../models/Playlist';
-import { useAppSettingsDispatch } from '../redux/hooks';
+import { useAppDispatch, useAppSettingsDispatch } from '../redux/hooks';
 import { modalStyle } from '../utility/ModalStyle';
 import classes from './pages/Playlists.module.scss';
 
@@ -23,7 +23,8 @@ interface PlaylistTileProps {
 }
 
 export const PlaylistTile: React.FC<PlaylistTileProps> = (props: PlaylistTileProps) => {
-    const appSettingsDispatch = useAppSettingsDispatch();
+    const dispatch = useAppDispatch();
+    const appSettingsDispatch = useAppSettingsDispatch(dispatch);
     const { playPlaylist, playlist } = props;
 
     const [isDeleting, setIsDeleting] = useState(false);

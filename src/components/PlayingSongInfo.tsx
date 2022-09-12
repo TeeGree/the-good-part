@@ -11,6 +11,7 @@ import { parseNumberAsMinutesText } from '../utility/StringUtils';
 import { SongTitleContainer } from './SongTitleContainer';
 import { VolumeContainer } from './VolumeContainer';
 import classes from './PlayingSongInfo.module.scss';
+import { useIsPausedSelector } from '../redux/hooks';
 
 interface PlayingSongInfoProps {
     nameOfFile?: string;
@@ -18,7 +19,6 @@ interface PlayingSongInfoProps {
     playingSound?: Howl;
     onPause: (shouldSetPauseState: boolean) => void;
     onPlay: () => void;
-    isPaused: boolean;
     currentPlaybackTime: number | null;
     totalDuration: number | null;
     playNextSong: () => void;
@@ -31,9 +31,10 @@ interface PlayingSongInfoProps {
 
 export const PlayingSongInfo: React.FC<PlayingSongInfoProps> = (props: PlayingSongInfoProps) => {
     const [hoveredOverPlaybackSlider, setHoveredOverPlaybackSlider] = useState(false);
+    const isPaused = useIsPausedSelector();
 
     const togglePlay = (): void => {
-        if (props.isPaused) {
+        if (isPaused) {
             props.onPlay();
         } else {
             props.onPause(true);
@@ -72,7 +73,7 @@ export const PlayingSongInfo: React.FC<PlayingSongInfoProps> = (props: PlayingSo
         <span className={classes.playbackButtonsContainer}>
             {getPreviousButton()}
             <IconButton className={classes.playButton} color="inherit" onClick={togglePlay}>
-                {props.isPaused ? <PlayArrowIcon /> : <PauseIcon />}
+                {isPaused ? <PlayArrowIcon /> : <PauseIcon />}
             </IconButton>
             {getNextButton()}
         </span>
@@ -102,7 +103,7 @@ export const PlayingSongInfo: React.FC<PlayingSongInfoProps> = (props: PlayingSo
     };
 
     const onSliderChange = (_: Event, value: number | number[]): void => {
-        if (!props.isPaused) {
+        if (!isPaused) {
             props.onPause(false);
         }
 
@@ -115,7 +116,7 @@ export const PlayingSongInfo: React.FC<PlayingSongInfoProps> = (props: PlayingSo
     ): void => {
         props.seekToPosition(value as number);
 
-        if (!props.isPaused) {
+        if (!isPaused) {
             props.onPlay();
         }
     };

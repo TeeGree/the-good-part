@@ -12,7 +12,13 @@ import { getFilenameFromPath } from './utility/FilePathUtils';
 import { SongInfo } from './models/SongInfo';
 import { defaultVolume } from './redux/state/volumeState';
 import { Playlists } from './components/pages/Playlists';
-import { useAppSettingsDispatch, useAppSettingsSelector } from './redux/hooks';
+import {
+    useAppDispatch,
+    useAppSettingsDispatch,
+    useAppSettingsSelector,
+    useIsPausedDispatch,
+    useIsPausedSelector,
+} from './redux/hooks';
 import { PlaylistSummary } from './components/pages/PlaylistSummary';
 
 // Needed to polyfill dependencies that have been removed from Node.
@@ -22,9 +28,13 @@ window.process = process;
 Howler.volume(defaultVolume);
 
 const App: React.FC = () => {
-    const appSettingsDispatch = useAppSettingsDispatch();
+    const dispatch = useAppDispatch();
+    const appSettingsDispatch = useAppSettingsDispatch(dispatch);
+    const isPausedDispatch = useIsPausedDispatch(dispatch);
+
     // TODO: Fix issue with appSettings not refreshing from 0 to 1 song.
     const appSettings = useAppSettingsSelector();
+    const isPaused = useIsPausedSelector();
 
     const [playingSound, setPlayingSound] = useState<Howl>();
     const [playingSong, setPlayingSong] = useState<SongInfo>();
@@ -33,7 +43,6 @@ const App: React.FC = () => {
     const [playingSongIndex, setPlayingSongIndex] = useState<number>();
     const [currentPlaybackTime, setCurrentPlaybackTime] = useState<number | null>(null);
     const [totalDuration, setTotalDuration] = useState<number | null>(null);
-    const [isPaused, setIsPaused] = useState<boolean>(false);
 
     const setAppSettings = (value: AppSettings): void => {
         appSettingsDispatch(value);
@@ -125,15 +134,13 @@ const App: React.FC = () => {
             setPlayingSong(song);
             setPlayingSound(howlerSound);
             setTotalDuration(howlerSound.duration());
-            if (songId !== undefined) {
-                setPlayingSongId(songId);
-                setPlayingSongIndex(index);
-                setPlayingPlaylistId(playlistId);
-                setHowlerEndCallback(howlerSound, index, playlistId);
-            }
+            setPlayingSongId(songId);
+            setPlayingSongIndex(index);
+            setPlayingPlaylistId(playlistId);
+            setHowlerEndCallback(howlerSound, index, playlistId);
 
             if (isPaused) {
-                setIsPaused(false);
+                isPausedDispatch(false);
             }
         });
 
@@ -172,13 +179,13 @@ const App: React.FC = () => {
     const pausePlayingSong = (shouldSetPauseState: boolean = true): void => {
         playingSound?.pause();
         if (shouldSetPauseState) {
-            setIsPaused(true);
+            isPausedDispatch(true);
         }
     };
 
     const resumePlayingSong = (): void => {
         playingSound?.play();
-        setIsPaused(false);
+        isPausedDispatch(false);
     };
 
     const seekToPosition = (pos: number): void => {
@@ -207,7 +214,6 @@ const App: React.FC = () => {
                         playingSound={playingSound}
                         onPause={pausePlayingSong}
                         onPlay={resumePlayingSong}
-                        isPaused={isPaused}
                         currentPlaybackTime={currentPlaybackTime}
                         totalDuration={totalDuration}
                         playNextSong={playNextSong}
@@ -281,7 +287,6 @@ const App: React.FC = () => {
                                     playSong={playSong}
                                     onPause={pausePlayingSong}
                                     onResume={resumePlayingSong}
-                                    isPaused={isPaused}
                                     playingSongId={
                                         playingPlaylistId === undefined ? playingSongId : undefined
                                     }
@@ -300,7 +305,6 @@ const App: React.FC = () => {
                                     playSong={playSong}
                                     onPause={pausePlayingSong}
                                     onResume={resumePlayingSong}
-                                    isPaused={isPaused}
                                     playingSongId={playingSongId}
                                 />
                             }

@@ -8,7 +8,6 @@ import classes from './PlaylistSummary.module.scss';
 interface PlaylistSummaryProps {
     playSong: (index: number, playlistId: string) => void;
     playingSongId: string | undefined;
-    isPaused: boolean;
     onPause: () => void;
     onResume: () => void;
 }
@@ -16,7 +15,7 @@ interface PlaylistSummaryProps {
 export const PlaylistSummary: React.FC<PlaylistSummaryProps> = (props: PlaylistSummaryProps) => {
     const appSettings = useAppSettingsSelector();
     const { id } = useParams();
-    const { playingSongId, playSong, isPaused, onResume, onPause } = props;
+    const { playingSongId, playSong, onResume, onPause } = props;
 
     if (id === undefined) {
         throw Error('No playlist ID was supplied!');
@@ -48,7 +47,6 @@ export const PlaylistSummary: React.FC<PlaylistSummaryProps> = (props: PlaylistS
             <div className={classes.songTableContainer}>
                 <SongTable
                     playSong={playSongInPlaylist}
-                    isPaused={isPaused}
                     onPause={onPause}
                     onResume={onResume}
                     playingSongId={playingSongId}

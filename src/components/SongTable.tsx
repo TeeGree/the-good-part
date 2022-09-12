@@ -14,7 +14,6 @@ import { SongInfo } from '../models/SongInfo';
 interface SongTableProps {
     playSong: (index: number) => void;
     playingSongId: string | undefined;
-    isPaused: boolean;
     onPause: () => void;
     onResume: () => void;
     songs: SongInfo[];
@@ -22,7 +21,7 @@ interface SongTableProps {
 
 export const SongTable: React.FC<SongTableProps> = (props: SongTableProps) => {
     const appSettings = useAppSettingsSelector();
-    const { playingSongId, playSong, isPaused, onResume, onPause, songs } = props;
+    const { playingSongId, playSong, onResume, onPause, songs } = props;
 
     const getPlaylists = (): Playlist[] => {
         return appSettings?.playlists ?? [];
@@ -37,7 +36,6 @@ export const SongTable: React.FC<SongTableProps> = (props: SongTableProps) => {
                     song={song}
                     playSong={playSong}
                     playingSongId={playingSongId}
-                    isPaused={isPaused}
                     onPause={onPause}
                     onResume={onResume}
                     songIndex={i}

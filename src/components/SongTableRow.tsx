@@ -18,7 +18,7 @@ import { TooltipOnOverflow } from './TooltipOnOverflow';
 import { getFilenameWithoutExtension } from '../utility/FilePathUtils';
 import { modalStyle } from '../utility/ModalStyle';
 import { Playlist } from '../models/Playlist';
-import { useAppSettingsDispatch } from '../redux/hooks';
+import { useAppDispatch, useAppSettingsDispatch, useIsPausedSelector } from '../redux/hooks';
 
 interface SongTableRowProps {
     song: SongInfo;
@@ -27,14 +27,15 @@ interface SongTableRowProps {
     playSong: (index: number) => void;
     onPause: () => void;
     onResume: () => void;
-    isPaused: boolean;
     playlists: Playlist[];
 }
 
 export const SongTableRow: React.FC<SongTableRowProps> = (props: SongTableRowProps) => {
-    const appSettingsDispatch = useAppSettingsDispatch();
-    const { song, songIndex, playingSongId, playSong, onPause, onResume, isPaused, playlists } =
-        props;
+    const dispatch = useAppDispatch();
+    const appSettingsDispatch = useAppSettingsDispatch(dispatch);
+    const { song, songIndex, playingSongId, playSong, onPause, onResume, playlists } = props;
+
+    const isPaused = useIsPausedSelector();
 
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const [isAddingToPlaylist, setIsAddingToPlaylist] = useState(false);

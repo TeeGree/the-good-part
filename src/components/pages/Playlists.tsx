@@ -2,7 +2,7 @@ import { Add } from '@mui/icons-material';
 import { Box, Button, Modal, TextField, Tooltip } from '@mui/material';
 import React, { useEffect, useRef, useState } from 'react';
 import { Playlist } from '../../models/Playlist';
-import { useAppSettingsDispatch, useAppSettingsSelector } from '../../redux/hooks';
+import { useAppDispatch, useAppSettingsDispatch, useAppSettingsSelector } from '../../redux/hooks';
 import { modalStyle } from '../../utility/ModalStyle';
 import { PlaylistTile } from '../PlaylistTile';
 import classes from './Playlists.module.scss';
@@ -37,7 +37,8 @@ export const Playlists: React.FC<PlaylistsProps> = (props: PlaylistsProps) => {
         };
     }, [elementRef]);
 
-    const appSettingsDispatch = useAppSettingsDispatch();
+    const dispatch = useAppDispatch();
+    const appSettingsDispatch = useAppSettingsDispatch(dispatch);
     const appSettings = useAppSettingsSelector();
     const { playPlaylist } = props;
 

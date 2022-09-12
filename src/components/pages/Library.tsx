@@ -7,7 +7,6 @@ import classes from './Library.module.scss';
 interface LibraryProps {
     playSong: (index: number) => void;
     playingSongId: string | undefined;
-    isPaused: boolean;
     onPause: () => void;
     onResume: () => void;
     fileInputLabel: string;
@@ -15,7 +14,7 @@ interface LibraryProps {
 
 export const Library: React.FC<LibraryProps> = (props: LibraryProps) => {
     const appSettings = useAppSettingsSelector();
-    const { playingSongId, playSong, isPaused, onResume, onPause, fileInputLabel } = props;
+    const { playingSongId, playSong, onResume, onPause, fileInputLabel } = props;
 
     return (
         <div className={classes.page}>
@@ -25,7 +24,6 @@ export const Library: React.FC<LibraryProps> = (props: LibraryProps) => {
             <div className={classes.songTableContainer}>
                 <SongTable
                     playSong={playSong}
-                    isPaused={isPaused}
                     onPause={onPause}
                     onResume={onResume}
                     playingSongId={playingSongId}
