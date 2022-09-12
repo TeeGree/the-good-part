@@ -29,7 +29,6 @@ const App: React.FC = () => {
     const [playingSound, setPlayingSound] = useState<Howl>();
     const [playingSong, setPlayingSong] = useState<SongInfo>();
     const [playingPlaylistId, setPlayingPlaylistId] = useState<string | undefined>(undefined);
-    const [nameOfFile, setNameOfFile] = useState<string>();
     const [playingSongId, setPlayingSongId] = useState<string>();
     const [playingSongIndex, setPlayingSongIndex] = useState<number>();
     const [currentPlaybackTime, setCurrentPlaybackTime] = useState<number | null>(null);
@@ -116,7 +115,6 @@ const App: React.FC = () => {
         }
 
         const filepath = `.\\${song.filename}`;
-        const filename = getFilenameFromPath(filepath);
 
         const howlerSound = new Howl({
             src: [filepath],
@@ -126,7 +124,6 @@ const App: React.FC = () => {
         howlerSound.once('play', () => {
             setPlayingSong(song);
             setPlayingSound(howlerSound);
-            setNameOfFile(filename);
             setTotalDuration(howlerSound.duration());
             if (songId !== undefined) {
                 setPlayingSongId(songId);
@@ -192,12 +189,20 @@ const App: React.FC = () => {
         }
     };
 
+    const getFilename = (song: SongInfo | undefined): string => {
+        if (song?.filename === undefined) {
+            return '';
+        }
+
+        return getFilenameFromPath(song.filename);
+    };
+
     const getPlayingSongInfo = (): JSX.Element => {
         if (playingSound !== undefined) {
             return (
                 <div className={classes.playingSongInfo}>
                     <PlayingSongInfo
-                        nameOfFile={nameOfFile}
+                        nameOfFile={getFilename(playingSong)}
                         fileMetadata={playingSong?.metadata}
                         playingSound={playingSound}
                         onPause={pausePlayingSong}
