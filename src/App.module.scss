@@ -1,5 +1,5 @@
 @use 'components/NavPanel.module.scss';
-@use 'components/PlayingSongInfo.module.scss';
+@use 'components/PlayingSongDock.module.scss';
 
 .app {
     text-align: center;
@@ -18,10 +18,10 @@
     flex: 1;
 }
 
-.playingSongInfo {
+.playingSongDock {
     width: 100%;
     font-size: medium;
-    height: PlayingSongInfo.$playingSongInfoHeight;
+    height: PlayingSongDock.$playingSongDockHeight;
     z-index: 1201; // one more than the material ui drawer (nav bar)
     align-self: flex-end;
     justify-content: flex-end;

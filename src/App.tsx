@@ -3,7 +3,7 @@ import { Howl } from 'howler';
 import { Buffer } from 'buffer';
 import * as process from 'process';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { PlayingSongInfo } from './components/PlayingSongInfo';
+import { PlayingSongDock } from './components/PlayingSongDock';
 import classes from './App.module.scss';
 import { AppSettings } from './models/AppSettings';
 import { Library } from './components/pages/Library';
@@ -27,6 +27,18 @@ window.process = process;
 
 Howler.volume(defaultVolume);
 
+interface PlayingSongInfo {
+    songInfo: SongInfo | undefined;
+    playlistId: string | undefined;
+    howlerSound: Howl | undefined;
+}
+
+const initialPlayingSongInfo: PlayingSongInfo = {
+    songInfo: undefined,
+    playlistId: undefined,
+    howlerSound: undefined,
+};
+
 const App: React.FC = () => {
     const dispatch = useAppDispatch();
     const appSettingsDispatch = useAppSettingsDispatch(dispatch);
@@ -36,13 +48,16 @@ const App: React.FC = () => {
     const appSettings = useAppSettingsSelector();
     const isPaused = useIsPausedSelector();
 
-    const [playingSound, setPlayingSound] = useState<Howl>();
-    const [playingSong, setPlayingSong] = useState<SongInfo>();
-    const [playingPlaylistId, setPlayingPlaylistId] = useState<string | undefined>(undefined);
-    const [playingSongId, setPlayingSongId] = useState<string>();
+    const [playingSongInfo, setPlayingSongInfo] = useState<PlayingSongInfo>(initialPlayingSongInfo);
     const [playingSongIndex, setPlayingSongIndex] = useState<number>();
     const [currentPlaybackTime, setCurrentPlaybackTime] = useState<number | null>(null);
     const [totalDuration, setTotalDuration] = useState<number | null>(null);
+
+    const {
+        songInfo: playingSong,
+        howlerSound: playingSound,
+        playlistId: playingPlaylistId,
+    } = playingSongInfo;
 
     const setAppSettings = (value: AppSettings): void => {
         appSettingsDispatch(value);
@@ -55,8 +70,8 @@ const App: React.FC = () => {
     }, []);
 
     useEffect(() => {
-        if (playingSongId !== undefined) {
-            const index = appSettings.songs.findIndex((song) => song.id === playingSongId);
+        if (playingSong?.id !== undefined) {
+            const index = appSettings.songs.findIndex((song) => song.id === playingSong.id);
             if (index >= 0 && playingSound != null) {
                 setHowlerEndCallback(playingSound, index);
             }
@@ -64,12 +79,9 @@ const App: React.FC = () => {
     }, [appSettings]);
 
     const clearPlayingSong = (): void => {
-        setPlayingSound(undefined);
         setCurrentPlaybackTime(null);
         setTotalDuration(null);
-        setPlayingSongId(undefined);
-        setPlayingSong(undefined);
-        setPlayingPlaylistId(undefined);
+        setPlaybackStates(undefined, undefined, undefined);
     };
 
     useEffect(() => {
@@ -107,6 +119,18 @@ const App: React.FC = () => {
         return songId;
     };
 
+    const setPlaybackStates = (
+        song: SongInfo | undefined,
+        sound: Howl | undefined,
+        playlistId: string | undefined,
+    ) => {
+        setPlayingSongInfo({
+            songInfo: song,
+            howlerSound: sound,
+            playlistId,
+        });
+    };
+
     const playSong = (index: number, playlistId?: string): void => {
         const songId = getSongId(index, playlistId);
 
@@ -131,12 +155,9 @@ const App: React.FC = () => {
         });
 
         howlerSound.once('play', () => {
-            setPlayingSong(song);
-            setPlayingSound(howlerSound);
-            setTotalDuration(howlerSound.duration());
-            setPlayingSongId(songId);
+            setPlaybackStates(song, howlerSound, playlistId);
             setPlayingSongIndex(index);
-            setPlayingPlaylistId(playlistId);
+            setTotalDuration(howlerSound.duration());
             setHowlerEndCallback(howlerSound, index, playlistId);
 
             if (isPaused) {
@@ -168,10 +189,7 @@ const App: React.FC = () => {
             if (index !== undefined && length > index + 1) {
                 playSong(index + 1, playlistId);
             } else {
-                setPlayingSound(undefined);
-                setPlayingSong(undefined);
-                setPlayingSongId(undefined);
-                setPlayingPlaylistId(undefined);
+                setPlaybackStates(undefined, undefined, undefined);
             }
         });
     };
@@ -204,11 +222,11 @@ const App: React.FC = () => {
         return getFilenameFromPath(song.filename);
     };
 
-    const getPlayingSongInfo = (): JSX.Element => {
+    const getPlayingSongDock = (): JSX.Element => {
         if (playingSound !== undefined) {
             return (
-                <div className={classes.playingSongInfo}>
-                    <PlayingSongInfo
+                <div className={classes.playingSongDock}>
+                    <PlayingSongDock
                         nameOfFile={getFilename(playingSong)}
                         fileMetadata={playingSong?.metadata}
                         playingSound={playingSound}
@@ -288,7 +306,9 @@ const App: React.FC = () => {
                                     onPause={pausePlayingSong}
                                     onResume={resumePlayingSong}
                                     playingSongId={
-                                        playingPlaylistId === undefined ? playingSongId : undefined
+                                        playingPlaylistId === undefined
+                                            ? playingSong?.id
+                                            : undefined
                                     }
                                     fileInputLabel="Choose music file to add to library"
                                 />
@@ -305,7 +325,7 @@ const App: React.FC = () => {
                                     playSong={playSong}
                                     onPause={pausePlayingSong}
                                     onResume={resumePlayingSong}
-                                    playingSongId={playingSongId}
+                                    playingSongId={playingSong?.id}
                                 />
                             }
                         />
@@ -313,7 +333,7 @@ const App: React.FC = () => {
                     </Routes>
                 </div>
                 <NavPanel />
-                {getPlayingSongInfo()}
+                {getPlayingSongDock()}
             </div>
         </div>
     );

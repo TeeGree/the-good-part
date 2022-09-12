@@ -10,10 +10,10 @@ import { SxProps, Theme } from '@mui/material/styles';
 import { parseNumberAsMinutesText } from '../utility/StringUtils';
 import { SongTitleContainer } from './SongTitleContainer';
 import { VolumeContainer } from './VolumeContainer';
-import classes from './PlayingSongInfo.module.scss';
+import classes from './PlayingSongDock.module.scss';
 import { useIsPausedSelector } from '../redux/hooks';
 
-interface PlayingSongInfoProps {
+interface PlayingSongDockProps {
     nameOfFile?: string;
     fileMetadata?: IAudioMetadata;
     playingSound?: Howl;
@@ -29,7 +29,7 @@ interface PlayingSongInfoProps {
     seekToPosition: (pos: number) => void;
 }
 
-export const PlayingSongInfo: React.FC<PlayingSongInfoProps> = (props: PlayingSongInfoProps) => {
+export const PlayingSongDock: React.FC<PlayingSongDockProps> = (props: PlayingSongDockProps) => {
     const [hoveredOverPlaybackSlider, setHoveredOverPlaybackSlider] = useState(false);
     const isPaused = useIsPausedSelector();
 
@@ -153,7 +153,7 @@ export const PlayingSongInfo: React.FC<PlayingSongInfoProps> = (props: PlayingSo
         );
     };
 
-    const getPlayingSongInfo = (): JSX.Element => {
+    const getPlayingSongDock = (): JSX.Element => {
         if (props.playingSound != null && props.playingSound !== undefined) {
             return (
                 <div className={classes.songInfoContainer}>
@@ -172,5 +172,5 @@ export const PlayingSongInfo: React.FC<PlayingSongInfoProps> = (props: PlayingSo
         return <></>;
     };
 
-    return getPlayingSongInfo();
+    return getPlayingSongDock();
 };
